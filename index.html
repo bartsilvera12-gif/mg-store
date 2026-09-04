@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MG Store — Tecnología, hogar y mucho más</title>
+<meta name="description" content="MG Store: tecnología, hogar y mucho más. Envíos a todo Paraguay, compra segura y atención personalizada.">
+<link rel="icon" type="image/png" href="/logo.png">
+<meta property="og:title" content="MG Store">
+<meta property="og:description" content="Tecnología, hogar y mucho más. Envíos a todo Paraguay.">
+<meta property="og:image" content="/logo.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/modernist-a7d941df-22f5-4998-bf8d-848e8fea2637/styles.css">
+  <script src="_ds/modernist-a7d941df-22f5-4998-bf8d-848e8fea2637/_ds_bundle.js"></script>
+  <script src="./image-slot.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html,body{margin:0;padding:0;background:#fff;color:#0F1633;font-family:Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+    *{box-sizing:border-box}
+    a{color:#0B1F5F;text-decoration:none}
+    a:hover{color:#1B49D6}
+    button{font-family:inherit}
+    input{font-family:inherit}
+    :focus-visible{outline:2px solid #1B49D6;outline-offset:2px}
+    @keyframes mgUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    @keyframes mgFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+    @keyframes mgNudge{0%,60%,100%{transform:translate(0,0)}80%{transform:translate(3px,-3px)}}
+    @media (min-width:901px) and (max-width:1200px){[data-grid="products"][data-view="4col"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+    @keyframes mgMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @media (max-width:900px){
+      [data-m~="hide"]{display:none!important}
+      [data-m~="show"]{display:flex!important}
+      [data-m~="stack"]{grid-template-columns:1fr!important}
+      [data-m~="col"]{flex-direction:column!important;align-items:stretch!important}
+      [data-m~="h1"]{font-size:38px!important}
+      [data-m~="viz"]{height:400px!important;margin-top:8px}
+      [data-m~="scroll"]{display:flex!important;overflow-x:auto;gap:12px;scroll-snap-type:x mandatory;padding-bottom:8px}
+      [data-m~="scroll"]>*{flex:0 0 78vw;grid-column:auto!important;grid-row:auto!important;min-height:280px!important;scroll-snap-align:start}
+      [data-m~="tight"]{padding-top:56px!important;padding-bottom:56px!important}
+      [data-m~="wa"]{right:16px!important;bottom:16px!important}
+      [data-m~="watext"]{display:none!important}
+    }
+    [data-range] input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;position:absolute;left:0;top:8px;width:100%;height:28px;margin:0}
+    [data-range] input[type=range]::-webkit-slider-runnable-track{background:transparent}
+    [data-range] input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;pointer-events:auto;width:20px;height:20px;background:#fff;border:3px solid #1B49D6;cursor:pointer;margin-top:4px;transition:background .2s}
+    [data-range] input[type=range]::-webkit-slider-thumb:hover{background:#EEF2FD}
+    [data-range] input[type=range]::-moz-range-track{background:transparent}
+    [data-range] input[type=range]::-moz-range-thumb{pointer-events:auto;width:14px;height:14px;background:#fff;border:3px solid #1B49D6;border-radius:0;cursor:pointer}
+    @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+  </style>
+</helmet>
+
+<div style="min-height:100vh;background:#fff;color:#0F1633;font-family:Manrope,system-ui,sans-serif;overflow-x:clip">
+
+  <!-- top bar -->
+  <sc-if value="{{ showTopBar }}" hint-placeholder-val="{{ true }}">
+  <div style="background:#0B1F5F;color:#fff;font-size:12px;letter-spacing:.04em;font-weight:600;text-align:center;padding:8px 20px">Envíos a todo Paraguay · Compra segura · Atención personalizada</div>
+  </sc-if>
+
+  <!-- header -->
+  <header onMouseLeave="{{ closeMega }}" style="{{ headerStyle }}">
+    <div style="max-width:1440px;margin:0 auto;padding:0 clamp(20px,5vw,72px);height:72px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:24px">
+      <a href="#" style="display:flex;align-items:center">
+        <img src="logo.png" alt="MG Store" style="height:52px;width:auto;display:block" />
+      </a>
+      <nav data-m="hide" style="display:flex;gap:32px;font-size:14px;font-weight:600">
+        <a href="#" onClick="{{ goHome }}" style="color:#0F1633;padding:26px 0">Inicio</a>
+        <a href="#catalogo" onClick="{{ goCatalog }}" style="{{ catalogLinkStyle }}">Catálogo</a>
+        <a href="#categorias" onClick="{{ goHome }}" onMouseEnter="{{ openMega }}" style="{{ megaLinkStyle }}">Categorías</a>
+        <a href="#catalogo" onClick="{{ goOffers }}" style="{{ offersLinkStyle }}">Ofertas</a>
+        <a href="#nosotros" onClick="{{ goAbout }}" style="{{ aboutLinkStyle }}">Nosotros</a>
+      </nav>
+      <div style="display:flex;justify-content:flex-end;align-items:center;gap:6px">
+        <button onClick="{{ openSearch }}" aria-label="Buscar" style="display:flex;align-items:center;gap:8px;height:44px;padding:0 14px;border:1px solid #E3E7F0;background:#fff;color:#0F1633;font-size:14px;font-weight:600;cursor:pointer;transition:border-color .2s" style-hover="border-color:#1B49D6">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+          <span data-m="hide">Buscar</span>
+        </button>
+        <a data-m="hide" href="{{ waHref }}" target="_blank" rel="noopener" aria-label="WhatsApp" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;color:#1EB531;transition:background .2s" style-hover="background:#EAF8EC">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+        </a>
+        <button aria-label="Carrito" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:#0F1633;cursor:pointer;transition:background .2s" style-hover="background:#F3F5FA">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+        </button>
+        <button data-m="show" onClick="{{ openMenu }}" aria-label="Menú" style="display:none;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:#0F1633;cursor:pointer">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- mega menu -->
+    <sc-if value="{{ megaOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute;left:0;right:0;top:100%;background:#fff;border-top:1px solid #E3E7F0;border-bottom:2px solid #0B1F5F;box-shadow:0 24px 48px -24px rgba(11,31,95,.25);animation:mgUp .25s ease both">
+      <div style="max-width:1440px;margin:0 auto;padding:36px clamp(20px,5vw,72px) 40px;display:grid;grid-template-columns:repeat(4,1fr) 1.2fr;gap:40px">
+        <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="4">
+          <div>
+            <div style="font-size:13px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B1F5F;padding-bottom:12px;border-bottom:2px solid #0B1F5F;margin-bottom:14px">{{ cat.name }}</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <sc-for list="{{ cat.items }}" as="it" hint-placeholder-count="4">
+                <a href="#catalogo" onClick="{{ goCatalog }}" style="font-size:15px;color:#0F1633;display:block;padding:2px 0;transition:color .2s,transform .2s" style-hover="color:#1B49D6;transform:translateX(4px)">{{ it }}</a>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+        <div style="background:#0B1F5F;color:#fff;padding:24px;display:flex;flex-direction:column;justify-content:space-between;gap:24px;min-height:220px">
+          <div style="font-size:12px;font-weight:800;letter-spacing:.1em;color:#1EB531">NUEVAS CATEGORÍAS</div>
+          <div style="font-size:22px;font-weight:700;line-height:1.2;text-wrap:pretty">La tienda sigue creciendo. Muy pronto, más universos de producto.</div>
+          <a href="#catalogo" onClick="{{ goCatalog }}" style="color:#fff;font-weight:700;font-size:14px;display:flex;align-items:center;gap:8px">Ver el catálogo <span aria-hidden="true">→</span></a>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+  </header>
+
+  <!-- catalog view -->
+  <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
+  <section id="catalogo" style="background:#fff">
+    <div style="max-width:1440px;margin:0 auto;padding:40px clamp(20px,5vw,72px) 96px">
+      <div style="display:flex;gap:8px;font-size:13px;color:#5B6480;margin-bottom:20px"><a href="#" onClick="{{ goHome }}" style="color:#5B6480">Inicio</a><span>/</span><span style="color:#0B1F5F;font-weight:700">Catálogo</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;flex-wrap:wrap;padding-bottom:24px;border-bottom:2px solid #0B1F5F">
+        <div>
+          <h1 style="margin:0 0 6px;font-size:clamp(32px,3.4vw,48px);font-weight:800;letter-spacing:-.025em;line-height:1.02;color:#0B1F5F">Catálogo</h1>
+          <div style="font-size:14px;color:#5B6480;font-weight:600">{{ resultLabel }}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#0B1F5F;position:relative">Ordenar por
+          <button onClick="{{ toggleSort }}" style="{{ sortBtnStyle }}">{{ sortLabel }}<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"></path></svg></button>
+          <sc-if value="{{ sortOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute;right:0;top:calc(100% + 6px);z-index:20;min-width:220px;background:#fff;border:2px solid #0B1F5F;box-shadow:0 20px 40px -20px rgba(11,31,95,.35);display:flex;flex-direction:column;animation:mgUp .2s ease both">
+            <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="4">
+              <button onClick="{{ o.pick }}" style="{{ o.style }}">{{ o.label }}<sc-if value="{{ o.on }}" hint-placeholder-val="{{ false }}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></button>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:210px minmax(0,1fr);gap:36px;padding-top:32px" data-m="stack">
+        <!-- filters -->
+        <aside style="display:flex;flex-direction:column;gap:28px;align-self:start;position:sticky;top:96px">
+          <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#0B1F5F">FILTROS</div><button onClick="{{ clearFilters }}" style="border:0;background:transparent;font-size:13px;font-weight:700;color:#1B49D6;cursor:pointer;min-height:36px">Limpiar</button></div>
+
+          <div style="border-top:2px solid #0B1F5F;padding-top:14px">
+            <div style="font-size:14px;font-weight:800;color:#0B1F5F;margin-bottom:10px">Categoría</div>
+            <div style="display:flex;flex-direction:column">
+              <sc-for list="{{ catFilters }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.toggle }}" aria-pressed="{{ f.on }}" style="display:flex;align-items:center;gap:10px;min-height:40px;font-size:15px;color:#0F1633;cursor:pointer;border:0;background:transparent;padding:0;text-align:left">
+                  <span style="{{ f.boxStyle }}"><sc-if value="{{ f.on }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>{{ f.name }}
+                </button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid #E3E7F0;padding-top:14px">
+            <div style="font-size:14px;font-weight:800;color:#0B1F5F;margin-bottom:10px">Marca</div>
+            <div style="display:flex;flex-wrap:wrap;gap:8px">
+              <sc-for list="{{ brandFilters }}" as="f" hint-placeholder-count="4">
+                <button onClick="{{ f.toggle }}" style="{{ f.style }}">{{ f.name }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid #E3E7F0;padding-top:14px">
+            <div style="font-size:14px;font-weight:800;color:#0B1F5F;margin-bottom:10px">Precio</div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;font-weight:700;color:#0F1633;margin-bottom:4px"><span>{{ minPriceLabel }}</span><span>{{ maxPriceLabel }}</span></div>
+            <div data-range="true" style="position:relative;height:44px">
+              <div style="position:absolute;left:0;right:0;top:20px;height:4px;background:#E3E7F0"></div>
+              <div style="{{ rangeFillStyle }}"></div>
+              <input type="range" min="0" max="600000" step="10000" value="{{ minPrice }}" onChange="{{ setMinPrice }}" onInput="{{ setMinPrice }}" aria-label="Precio mínimo" />
+              <input type="range" min="0" max="600000" step="10000" value="{{ maxPrice }}" onChange="{{ setMaxPrice }}" onInput="{{ setMaxPrice }}" aria-label="Precio máximo" />
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+              <sc-for list="{{ pricePresets }}" as="p" hint-placeholder-count="3">
+                <button onClick="{{ p.apply }}" style="{{ p.style }}">{{ p.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+
+          <div style="border-top:1px solid #E3E7F0;padding-top:14px;display:flex;flex-direction:column;gap:4px">
+            <sc-for list="{{ flagFilters }}" as="f" hint-placeholder-count="2">
+              <button onClick="{{ f.toggle }}" aria-pressed="{{ f.on }}" style="display:flex;align-items:center;gap:10px;min-height:40px;font-size:15px;color:#0F1633;cursor:pointer;border:0;background:transparent;padding:0;text-align:left">
+                <span style="{{ f.boxStyle }}"><sc-if value="{{ f.on }}" hint-placeholder-val="{{ false }}"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></sc-if></span>{{ f.name }}
+              </button>
+            </sc-for>
+          </div>
+        </aside>
+
+        <!-- grid -->
+        <div style="min-width:0">
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;min-height:36px;align-items:center;justify-content:space-between">
+            <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+              <sc-for list="{{ activeChips }}" as="c" hint-placeholder-count="0">
+                <button onClick="{{ c.remove }}" style="display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;background:#F3F5FA;border:0;font-size:13px;font-weight:700;color:#0B1F5F;cursor:pointer">{{ c.label }} <span aria-hidden="true">×</span></button>
+              </sc-for>
+            </div>
+            <div role="group" aria-label="Vista" style="display:flex;border:1px solid #C9D1E3">
+              <sc-for list="{{ viewOptions }}" as="v" hint-placeholder-count="3">
+                <button onClick="{{ v.pick }}" aria-pressed="{{ v.on }}" style="{{ v.style }}">{{ v.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+          <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+          <div data-grid="products" data-view="{{ gridView }}" style="display:grid;gap:16px;grid-template-columns:{{ gridCols }}">
+            <sc-for list="{{ products }}" as="p" hint-placeholder-count="8">
+              <article style="background:#fff;border:1px solid #E3E7F0;display:flex;flex-direction:{{ cardDir }};transition:border-color .2s,transform .2s;animation:mgUp .45s ease both;animation-delay:{{ p.delay }}" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+                <div style="position:relative;background:#F8F9FC;overflow:hidden;{{ mediaSize }}">
+                  <img src="{{ p.img }}" alt="{{ p.name }}" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:10px;background:#fff" />
+                  <sc-if value="{{ p.featured }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;left:0;top:0;background:#1EB531;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 10px;pointer-events:none">DESTACADO</div></sc-if>
+                  <sc-if value="{{ p.noStock }}" hint-placeholder-val="{{ false }}"><div style="position:absolute;right:0;top:0;background:#0F1633;color:#fff;font-size:11px;font-weight:800;letter-spacing:.08em;padding:6px 10px;pointer-events:none">SIN STOCK</div></sc-if>
+                </div>
+                <div style="padding:14px 16px 16px;display:flex;flex-direction:column;gap:6px;flex:1">
+                  <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#5B6480">{{ p.brandUpper }}</div>
+                  <div style="font-size:15px;font-weight:700;color:#0F1633;line-height:1.3;text-wrap:pretty">{{ p.name }}</div>
+                  <sc-if value="{{ p.showCategory }}" hint-placeholder-val="{{ true }}"><div style="font-size:12px;color:#5B6480">{{ p.category }}</div></sc-if>
+                  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-top:auto;padding-top:8px">
+                    <div style="font-size:18px;font-weight:800;color:#0B1F5F">{{ p.priceLabel }}</div>
+                    <div style="font-size:12px;font-weight:700;color:#5B6480;white-space:nowrap">{{ p.stockLabel }}</div>
+                  </div>
+                  <button style="margin-top:8px;height:44px;border:2px solid #0B1F5F;background:#fff;color:#0B1F5F;font-weight:700;font-size:14px;cursor:pointer;text-align:left;padding:0 14px;transition:background .2s,color .2s" style-hover="background:#0B1F5F;color:#fff">Agregar al carrito</button>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+          </sc-if>
+          <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+          <div style="border:2px dashed #C9D1E3;padding:48px 32px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+            <div style="font-size:22px;font-weight:800;color:#0B1F5F">Nada por acá con esos filtros.</div>
+            <p style="margin:0;color:#5B6480;font-size:15px">Probá ampliar el rango de precio o quitar alguna marca.</p>
+            <button onClick="{{ clearFilters }}" style="height:44px;padding:0 18px;border:0;background:#1B49D6;color:#fff;font-weight:700;font-size:14px;cursor:pointer">Limpiar filtros</button>
+          </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <!-- hero -->
+  <section style="position:relative;overflow:hidden;background:#071433">
+    <x-import component="ShaderBackground" from="./ShaderBackground.jsx" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
+    <div style="position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:48px clamp(20px,5vw,72px) 72px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight">
+      <div style="grid-column:span 5;display:flex;flex-direction:column;gap:24px;animation:mgUp .5s ease both">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#4ED962">TODO EN UN SOLO LUGAR</div>
+        <h1 data-m="h1" style="margin:0;font-size:clamp(40px,4.4vw,62px);line-height:1.02;font-weight:800;letter-spacing:-.025em;color:#fff;text-wrap:pretty;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
+          <span>{{ heroTitleLead }}</span>
+          <x-import component="HandwritingText" from="./HandwritingText.jsx" text="{{ heroTitleInk }}" height="1.35em" duration="2.1" stroke-width="2.4" hint-size="auto,1.35em"></x-import>
+        </h1>
+        <p style="margin:0;font-size:18px;line-height:1.55;color:rgba(255,255,255,.82);max-width:44ch;text-wrap:pretty">Tecnología, hogar y mucho más en una experiencia de compra simple, rápida y cercana.</p>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <a href="#categorias" style="display:inline-flex;align-items:center;height:52px;padding:0 26px;background:#1EB531;color:#fff;font-weight:700;font-size:15px;transition:background .2s,transform .2s" style-hover="background:#17A62B;transform:translateY(-1px)">Explorar MG Store</a>
+          <a href="#nosotros" onClick="{{ goAbout }}" style="display:inline-flex;align-items:center;gap:8px;height:52px;padding:0 20px;color:#fff;font-weight:700;font-size:15px;border-bottom:2px solid transparent;transition:border-color .2s" style-hover="border-color:#1EB531">Conocer la tienda <span aria-hidden="true">→</span></a>
+        </div>
+        <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.72);letter-spacing:.02em;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);margin-top:8px;max-width:360px">Envíos · Compra segura · Atención directa</div>
+      </div>
+
+      <div data-m="viz" style="grid-column:7 / span 6;position:relative;height:560px;animation:mgUp .6s .1s ease both">
+        <div style="position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:hidden;mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent)">
+          <x-import component="MarqueeEffect" from="./MarqueeEffect.jsx" direction="vertical" gap="12" speed="30" speed-on-hover="4" hint-size="100%,560px">
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/18.webp" alt="Mini drone plegable con cámara" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/11.webp" alt="Speaker Ecopower EP-1960" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/52.webp" alt="Camión de bomberos a control remoto" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/37.webp" alt="Aro de luz Ecopower con trípode" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          </x-import>
+          <x-import component="MarqueeEffect" from="./MarqueeEffect.jsx" direction="vertical" reverse="{{ true }}" gap="12" speed="30" speed-on-hover="4" hint-size="100%,560px">
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/57.webp" alt="Ferrari F50 de bloques" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/09.webp" alt="Smartwatch LUO W8 Ultra" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/61.webp" alt="Rosa roja de bloques para armar" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+            <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/23.webp" alt="Mini motosierra recargable" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          </x-import>
+        </div>
+        <div style="position:absolute;right:0;bottom:0;z-index:2;background:#1EB531;color:#fff;padding:14px 18px;font-size:13px;font-weight:800;letter-spacing:.06em;line-height:1.3">NOVEDADES<br />CADA SEMANA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- categories -->
+  <section id="categorias" style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight">
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:40px;flex-wrap:wrap">
+      <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F;max-width:18ch;text-wrap:pretty">Todo empieza por una categoría.</h2>
+      <p style="margin:0;color:#5B6480;font-size:16px;max-width:38ch;text-wrap:pretty">Universos de producto pensados para llegar rápido a lo que necesitás.</p>
+    </div>
+    <div data-m="scroll" style="display:grid;grid-template-columns:repeat(12,1fr);grid-auto-rows:230px;gap:16px">
+      <a href="#catalogo" onClick="{{ goCatalog }}" style="grid-column:span 6;grid-row:span 2;display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s" style-hover="border-color:#1B49D6">
+        <div style="flex:1;min-height:0;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:32px"><img src="img/18.webp" alt="Drones" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:18px 22px 20px;border-top:1px solid #E3E7F0"><div style="font-size:24px;font-weight:800;letter-spacing:-.02em;color:#0B1F5F">Drones</div><div style="font-size:14px;color:#5B6480;margin-top:3px">Cámara HD, plegables, con pantalla</div></div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" style="grid-column:span 3;display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s" style-hover="border-color:#1B49D6">
+        <div style="flex:1;min-height:0;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/52.webp" alt="Vehículos a control remoto" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:14px 18px 16px;border-top:1px solid #E3E7F0;font-size:18px;font-weight:800;color:#0B1F5F">Vehículos RC</div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" style="grid-column:span 3;display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s" style-hover="border-color:#1B49D6">
+        <div style="flex:1;min-height:0;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/11.webp" alt="Audio" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:14px 18px 16px;border-top:1px solid #E3E7F0;font-size:18px;font-weight:800;color:#0B1F5F">Audio</div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inBlocks }}" onMouseLeave="{{ outTile }}" style="grid-column:span 6;display:flex;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s" style-hover="border-color:#1B49D6">
+        <div style="flex:1;min-width:0;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/57.webp" alt="Bloques y armables" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="width:44%;flex:0 0 44%;padding:20px;border-left:1px solid #E3E7F0;display:flex;flex-direction:column;justify-content:space-between"><div style="font-size:20px;font-weight:800;letter-spacing:-.02em;color:#0B1F5F;text-wrap:pretty">Bloques y armables</div><div style="font-size:13px;font-weight:700;color:#1B49D6;display:flex;align-items:center;gap:6px">Ver <span aria-hidden="true" style="{{ arrowBlocks }}">→</span></div></div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inTools }}" onMouseLeave="{{ outTile }}" style="grid-column:span 4;overflow:hidden;background:#0B1F5F;color:#fff;display:flex;flex-direction:column;transition:background .2s" style-hover="background:#1B49D6">
+        <div style="flex:1;min-height:0;background:#fff;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/30.webp" alt="Herramientas" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:16px 20px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:18px;font-weight:800">Herramientas</div>
+          <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px">Ver <span aria-hidden="true" style="{{ arrowTools }}">→</span></div>
+        </div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" style="grid-column:span 4;display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s" style-hover="border-color:#1B49D6">
+        <div style="flex:1;min-height:0;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:6px"><img src="img/37.webp" alt="Foto y video" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:14px 18px 16px;border-top:1px solid #E3E7F0;font-size:18px;font-weight:800;color:#0B1F5F">Foto y video</div>
+      </a>
+      <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inGames }}" onMouseLeave="{{ outTile }}" style="grid-column:span 4;overflow:hidden;background:#1EB531;color:#fff;display:flex;flex-direction:column;transition:background .2s" style-hover="background:#17A62B">
+        <div style="flex:1;min-height:0;background:#fff;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/41.webp" alt="Juegos" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="padding:16px 20px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div style="font-size:18px;font-weight:800">Juegos</div>
+          <div style="font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px">Ver <span aria-hidden="true" style="{{ arrowGames }}">→</span></div>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- editorial banner -->
+  <section style="background:#0B1F5F;color:#fff;overflow:hidden">
+    <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight">
+      <div style="grid-column:span 5;display:flex;flex-direction:column;gap:24px">
+        <h2 style="margin:0;font-size:clamp(34px,3.6vw,54px);font-weight:800;letter-spacing:-.025em;line-height:1.02;text-wrap:pretty">Algo bueno siempre está por llegar.</h2>
+        <p style="margin:0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.78);max-width:42ch;text-wrap:pretty">Nuevas categorías, nuevos productos y oportunidades para encontrar justo lo que necesitás.</p>
+        <a href="#categorias" style="display:inline-flex;align-self:flex-start;align-items:center;height:52px;padding:0 26px;background:#1EB531;color:#fff;font-weight:700;font-size:15px;transition:background .2s" style-hover="background:#17A62B">Descubrir MG</a>
+      </div>
+      <div data-m="viz" style="grid-column:7 / span 6;height:440px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px">
+        <div style="grid-row:span 2;background:#fff;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/23.webp" alt="Mini motosierra recargable" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="background:#fff;display:flex;align-items:center;justify-content:center;padding:14px"><img src="img/09.webp" alt="Smartwatch LUO W8 Ultra" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="background:#fff;display:flex;align-items:center;justify-content:center;padding:14px"><img src="img/44.webp" alt="Bloques magnéticos" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- brands -->
+  <section id="marcas" style="background:#fff">
+    <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight">
+      <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px;flex-wrap:wrap">
+        <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Nuestras marcas</h2>
+        <p style="margin:0;color:#5B6480;font-size:16px;max-width:40ch;text-wrap:pretty">Trabajamos con marcas que ya conocés y en las que confiás.</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px" data-m="stack">
+        <sc-for list="{{ brandTiles }}" as="b" hint-placeholder-count="7">
+          <a href="#catalogo" onClick="{{ b.go }}" style="overflow:hidden;display:flex;flex-direction:column;background:#fff;border:1px solid #E3E7F0;color:#0B1F5F;transition:border-color .25s,transform .25s,box-shadow .25s" style-hover="border-color:#0B1F5F;transform:translateY(-3px);box-shadow:0 18px 34px -22px rgba(11,31,95,.45)">
+            <div style="{{ b.panelStyle }}"><img src="{{ b.img }}" alt="{{ b.name }}" loading="lazy" style="{{ b.imgStyle }}" /></div>
+            <div style="padding:16px 18px 18px;border-top:1px solid #E3E7F0;display:flex;flex-direction:column;gap:10px">
+              <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ b.name }}</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#5B6480">{{ b.meta }}<span aria-hidden="true" style="color:#1B49D6">→</span></div>
+            </div>
+          </a>
+        </sc-for>
+        <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inBrands }}" onMouseLeave="{{ outTile }}" style="background:#0B1F5F;color:#fff;padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:background .25s" style-hover="background:#1B49D6">
+          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;text-wrap:pretty">Ver todo el catálogo</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700">62 productos <span aria-hidden="true" style="{{ arrowBrands }}">→</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- why MG -->
+  <section style="background:#E8F7EA;border-top:2px solid #0B1F5F">
+  <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight">
+    <h2 style="margin:0 0 40px;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Por qué MG</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:2px solid #0B1F5F">
+      <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="4">
+        <div style="padding:28px 24px 32px 0;border-bottom:1px solid #B8DFC0;display:flex;flex-direction:column;gap:14px">
+          <div style="color:#1EB531">{{ b.icon }}</div>
+          <div style="font-size:19px;font-weight:800;color:#0B1F5F">{{ b.title }}</div>
+          <p style="margin:0;font-size:15px;line-height:1.55;color:#5B6480;text-wrap:pretty">{{ b.text }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+  </section>
+
+  <!-- offers -->
+  <section id="ofertas" style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight">
+    <div style="display:grid;grid-template-columns:repeat(12,1fr);gap:0;border:2px solid #0B1F5F" data-m="stack">
+      <div style="grid-column:span 7;padding:40px;display:flex;flex-direction:column;gap:14px;justify-content:center">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#1EB531">OFERTAS MG</div>
+        <h2 style="margin:0;font-size:clamp(28px,2.8vw,40px);font-weight:800;letter-spacing:-.02em;line-height:1.08;color:#0B1F5F;text-wrap:pretty">Cuando haya una buena oportunidad, va a estar acá.</h2>
+        <p style="margin:0;color:#5B6480;font-size:16px;line-height:1.6;max-width:46ch;text-wrap:pretty">Las promociones de MG Store se publican en este espacio. Activá las novedades y enterate antes que nadie.</p>
+        <a href="#catalogo" onClick="{{ goOffers }}" style="display:inline-flex;align-self:flex-start;align-items:center;gap:8px;height:48px;padding:0 22px;border:2px solid #0B1F5F;color:#0B1F5F;font-weight:700;font-size:14px;transition:background .2s,color .2s" style-hover="background:#0B1F5F;color:#fff">Ver ofertas <span aria-hidden="true">→</span></a>
+      </div>
+      <div style="grid-column:span 5;display:grid;grid-template-columns:1fr 1fr;background:#F3F5FA;border-left:2px solid #0B1F5F">
+        <div style="display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/07.webp" alt="Mini masajeador portátil Ecopower" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="display:flex;align-items:center;justify-content:center;padding:20px;border-left:1px solid #DDE3EF"><img src="img/06.webp" alt="Linterna y kit de herramientas Ecopower" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- newsletter -->
+  <section id="newsletter" style="border-top:2px solid #0B1F5F;background:#0B1F5F;color:#fff">
+    <div style="max-width:1440px;margin:0 auto;padding:72px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight">
+      <div style="grid-column:span 5">
+        <h2 style="margin:0 0 10px;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;color:#fff">Enterate primero.</h2>
+        <p style="margin:0;color:rgba(255,255,255,.75);font-size:16px;line-height:1.6;text-wrap:pretty">Novedades, lanzamientos y oportunidades de MG directamente para vos.</p>
+      </div>
+      <form onSubmit="{{ preventSubmit }}" data-m="col" style="grid-column:7 / span 6;display:flex;gap:0;border:2px solid #fff;background:#fff">
+        <input type="email" placeholder="Tu correo electrónico" aria-label="Tu correo electrónico" style="flex:1;min-width:0;height:56px;border:0;padding:0 18px;font-size:15px;background:transparent;color:#0F1633;outline-offset:-2px" />
+        <button type="submit" style="height:56px;padding:0 22px;border:0;background:#1EB531;color:#fff;font-weight:700;font-size:14px;cursor:pointer;white-space:nowrap;transition:background .2s" style-hover="background:#17A62B">Quiero recibir novedades</button>
+      </form>
+    </div>
+  </section>
+
+  </sc-if>
+
+  <!-- about page -->
+  <sc-if value="{{ isAbout }}" hint-placeholder-val="{{ false }}">
+  <section id="nosotros" style="position:relative;overflow:hidden;border-top:2px solid #0B1F5F;background:#071433">
+    <x-import component="ShaderBackground" from="./ShaderBackground.jsx" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
+    <div style="position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:40px clamp(20px,5vw,72px) 110px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px" data-m="stack tight">
+      <div style="grid-column:span 12;display:flex;gap:8px;font-size:13px;color:rgba(255,255,255,.6);margin-bottom:32px"><a href="#" onClick="{{ goHome }}" style="color:rgba(255,255,255,.6)">Inicio</a><span>/</span><span style="color:#fff;font-weight:700">Nosotros</span></div>
+      <div style="grid-column:span 4;display:flex;flex-direction:column;gap:20px">
+        <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#fff;text-wrap:pretty">Una tienda. Muchas formas de hacerte la vida más fácil.</h2>
+        <p style="margin:0;color:rgba(255,255,255,.82);font-size:16px;line-height:1.6;text-wrap:pretty">MG Store no se limita a un tipo de producto. Lo que usás en la cocina, lo que llevás en el bolsillo y lo que hace más cómoda tu casa conviven en un mismo lugar.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px 12px;font-size:14px;font-weight:800;color:#fff;letter-spacing:.02em"><span>Tecnología</span><span style="color:#4ED962">×</span><span>Cocina</span><span style="color:#4ED962">×</span><span>Hogar</span><span style="color:#4ED962">×</span><span>Uso diario</span></div>
+      </div>
+      <div ref="{{ aboutRef }}" style="grid-column:6 / span 7;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:14px" data-m="stack">
+        <sc-for list="{{ aboutCards }}" as="c" hint-placeholder-count="4">
+          <div style="{{ c.style }}" style-hover="background:rgba(255,255,255,.12);border-color:#4ED962;transform:translateY(-5px)">
+            <div style="font-size:19px;font-weight:800;letter-spacing:-.01em;line-height:1.2;color:#fff;text-wrap:pretty">{{ c.title }}</div>
+            <p style="margin:0;font-size:14px;line-height:1.55;color:rgba(255,255,255,.74);text-wrap:pretty">{{ c.text }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  </sc-if>
+
+  <!-- footer -->
+  <footer ref="{{ footerRef }}" style="{{ footerStyle }}">
+    <div style="max-width:1440px;margin:0 auto;padding:36px clamp(20px,5vw,72px) 24px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:start" data-m="stack">
+      <div style="grid-column:span 4;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+        <sc-if value="{{ showFooterLogo }}" hint-placeholder-val="{{ true }}">
+          <img src="logo.png" alt="MG Store" style="height:40px;width:auto;display:block" />
+        </sc-if>
+        <p style="margin:0;font-size:13px;max-width:30ch;text-wrap:pretty;{{ footerTagline }}">Una tienda para encontrar mucho más.</p>
+      </div>
+      <div style="grid-column:5 / span 8;display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:20px">
+        <sc-for list="{{ footerCols }}" as="c" hint-placeholder-count="3">
+          <div style="display:flex;flex-direction:column;gap:2px">
+            <div style="{{ footerHeadStyle }}">{{ c.title }}</div>
+            <sc-for list="{{ c.links }}" as="l" hint-placeholder-count="3">
+              <a href="{{ l.href }}" onClick="{{ l.go }}" style="{{ footerLinkStyle }}">{{ l.label }}</a>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="{{ footerBarStyle }}">
+      <div style="max-width:1440px;margin:0 auto;padding:12px clamp(20px,5vw,72px);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap">
+        <div style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;{{ footerMuted }}">
+          <span>© MG Store. Todos los derechos reservados.</span>
+          <a href="#" style="{{ footerMutedStyle }}">Términos y condiciones</a>
+          <a href="#" style="{{ footerMutedStyle }}">Política de privacidad</a>
+        </div>
+        <a href="https://neura.com.py" target="_blank" rel="noopener" style="{{ footerNeuraStyle }}">Desarrollado por Neura</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- whatsapp cta -->
+  <a data-m="wa" href="{{ waHref }}" target="_blank" rel="noopener" aria-label="¿Necesitás ayuda? WhatsApp" style="{{ waStyle }}" style-hover="background:#17A62B">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+    <span data-m="watext">¿Necesitás ayuda?</span>
+  </a>
+
+  <!-- search overlay -->
+  <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:100;background:#fff;animation:mgUp .25s ease both;overflow:auto">
+    <div style="max-width:1100px;margin:0 auto;padding:clamp(24px,6vh,64px) clamp(20px,5vw,72px)">
+      <div style="display:flex;justify-content:flex-end"><button onClick="{{ closeSearch }}" aria-label="Cerrar" style="width:44px;height:44px;border:0;background:transparent;cursor:pointer;color:#0F1633"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
+      <div style="display:flex;align-items:center;gap:16px;border-bottom:3px solid #0B1F5F;padding:12px 0">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0B1F5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input ref="{{ searchRef }}" type="search" placeholder="¿Qué estás buscando?" aria-label="Buscar" style="flex:1;min-width:0;border:0;outline:none;font-size:clamp(24px,3vw,40px);font-weight:700;color:#0B1F5F;background:transparent;padding:8px 0" />
+      </div>
+      <div style="display:flex;gap:24px;margin-top:14px;font-size:13px;color:#5B6480;font-weight:600"><span>Productos</span><span>Marcas</span><span>Categorías</span></div>
+      <div style="margin-top:48px">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#1EB531;margin-bottom:16px">BÚSQUEDAS POPULARES</div>
+        <div style="display:flex;flex-wrap:wrap;gap:10px">
+          <sc-for list="{{ popular }}" as="term" hint-placeholder-count="4">
+            <button style="height:44px;padding:0 18px;border:1px solid #E3E7F0;background:#fff;font-size:15px;font-weight:600;color:#0F1633;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#1B49D6;background:#F3F5FA">{{ term }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- mobile menu -->
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:100;background:#fff;overflow:auto;animation:mgUp .25s ease both">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 20px;border-bottom:2px solid #0B1F5F">
+      <img src="logo.png" alt="MG Store" style="height:44px;width:auto;mix-blend-mode:multiply" />
+      <button onClick="{{ closeMenu }}" aria-label="Cerrar" style="width:44px;height:44px;border:0;background:transparent;cursor:pointer;color:#0F1633"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+    </div>
+    <nav style="display:flex;flex-direction:column;padding:8px 20px">
+      <a href="#" onClick="{{ goHomeClose }}" style="font-size:22px;font-weight:800;color:#0B1F5F;padding:16px 0;border-bottom:1px solid #E3E7F0">Inicio</a>
+      <a href="#catalogo" onClick="{{ goCatalogClose }}" style="font-size:22px;font-weight:800;color:#0B1F5F;padding:16px 0;border-bottom:1px solid #E3E7F0">Catálogo</a>
+      <a href="#catalogo" onClick="{{ goOffers }}" style="font-size:22px;font-weight:800;color:#0B1F5F;padding:16px 0;border-bottom:1px solid #E3E7F0">Ofertas</a>
+      <a href="#nosotros" onClick="{{ goAboutClose }}" style="font-size:22px;font-weight:800;color:#0B1F5F;padding:16px 0;border-bottom:1px solid #E3E7F0">Nosotros</a>
+    </nav>
+    <div style="padding:24px 20px 40px;display:flex;flex-direction:column;gap:24px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#1EB531">CATEGORÍAS</div>
+      <sc-for list="{{ categories }}" as="cat" hint-placeholder-count="4">
+        <div>
+          <div style="font-size:16px;font-weight:800;color:#0B1F5F;margin-bottom:8px">{{ cat.name }}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ cat.items }}" as="it" hint-placeholder-count="3">
+              <a href="#categorias" onClick="{{ closeMenu }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid #E3E7F0;font-size:14px;color:#0F1633">{{ it }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+      <a href="{{ waHref }}" target="_blank" rel="noopener" style="display:flex;align-items:center;justify-content:center;gap:10px;height:52px;background:#1EB531;color:#fff;font-weight:700">Hablar por WhatsApp</a>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;whatsappNumber&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contacto&quot;},&quot;showTopBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;heroHeadline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;encontrar&quot;,&quot;options&quot;:[&quot;encontrar&quot;,&quot;necesitas&quot;,&quot;casa&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
+class Component extends DCLogic {
+  state = { scrolled: false, megaOpen: false, searchOpen: false, menuOpen: false, view: 'home', cats: [], brands: [], minPrice: 0, maxPrice: 600000, sort: 'relevancia', sortOpen: false, onlyStock: false, onlyOffer: false };
+  raw = [
+    ['Mini Masajeador Portatil Ecopower', 'Ecopower', 'Cuidado personal', 40, 90, 18, 1],
+    ['Linterna + Kit de herramientas Ecopower', 'Ecopower', 'Herramientas', 50, 100, 18, 1],
+    ['AVIÓN DRON A CONTROL REMOTO CON 4 HÉLICES', '', 'Drones', 40, 110, 5],
+    ['ROSA ROJA EN MACETA DE BLOQUES PARA ARMAR', '', 'Bloques y armables', 45, 75, 5],
+    ['MOTOCICLETA KAWASAKI NINJA ZX-10R DE BLOQUES – 867 PIEZAS', '', 'Bloques y armables', 45, 135, 2],
+    ['JEEP WRANGLER DE BLOQUES JIE STAR – 391 PIEZAS', 'Jie Star', 'Bloques y armables', 50, 130, 3],
+    ['CAMIÓN SEMIRREMOLQUE DE BLOQUES APENGBAOL – 268 PIEZAS', 'Apengbaol', 'Bloques y armables', 40, 80, 3],
+    ['FERRARI F50 DE BLOQUES MOULD KING – 396 PIEZAS', 'Mould King', 'Bloques y armables', 50, 100, 4],
+    ['AUTOBÚS A CONTROL REMOTO RECARGABLE', '', 'Vehículos RC', 50, 130, 3],
+    ['CAMIONETA 4X4 TODOTERRENO A CONTROL REMOTO – 40 KM/H', '', 'Vehículos RC', 70, 320, 1],
+    ['MINI CAMIONETA MONSTER A CONTROL REMOTO', '', 'Vehículos RC', 35, 65, 5],
+    ['GRÚA DE CONSTRUCCIÓN A CONTROL REMOTO', '', 'Vehículos RC', 50, 100, 5],
+    ['CAMIÓN DE BOMBEROS A CONTROL REMOTO CON LUCES Y SONIDOS', '', 'Vehículos RC', 50, 100, 4],
+    ['CAMIÓN VOLQUETE A CONTROL REMOTO DE 9 FUNCIONES', '', 'Vehículos RC', 50, 120, 4],
+    ['AUTO ANFIBIO A CONTROL REMOTO CON PISTOLA DE AGUA', '', 'Vehículos RC', 60, 160, 2],
+    ['PUENTE DE LONDRES TOWER BRIDGE – 2.300+ PIEZAS', '', 'Bloques y armables', 50, 100, 4],
+    ['TORRE EIFFEL 3D DE BLOQUES', '', 'Bloques y armables', 30, 80, 9],
+    ['AUTO ACROBÁTICO RC CON GIRO 360°', '', 'Vehículos RC', 55, 95, 10],
+    ['AUTO ACROBÁTICO A CONTROL REMOTO DE 6 RUEDAS CON VAPOR', '', 'Vehículos RC', 45, 105, 5],
+    ['EXCAVADORA A CONTROL REMOTO CON GIRO 360° Y BRAZO ARTICULADO', '', 'Vehículos RC', 50, 180, 3],
+    ['BLOQUES MAGNÉTICOS TIPO MINECRAFT – 150 PIEZAS', '', 'Bloques y armables', 50, 100, 6],
+    ['BLOQUES MAGNÉTICOS TIPO MINECRAFT – 100 PIEZAS', '', 'Bloques y armables', 40, 80, 5],
+    ['NISSAN SKYLINE GT-R R34 ESCALA 1:24', '', 'Vehículos RC', 50, 100, 3],
+    ['JUEGO DE MESA BASTA', '', 'Juegos', 34, 65, 5],
+    ['DRON MAX CON CÁMARA DUAL Y LUCES RGB', '', 'Drones', 70, 220, 5],
+    ['COCINA INFANTIL MY HAPPY KITCHEN CON LUZ Y SONIDO', '', 'Juegos', 45, 105, 2],
+    ['ARO DE LUZ ECOPOWER EP-T102 CON TRÍPODE', 'Ecopower', 'Foto y video', 45, 185, 1],
+    ['CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C088 3MP IP66', 'Ecopower', 'Tecnología', 50, 220, 2],
+    ['CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C068 3MP', 'Ecopower', 'Tecnología', 50, 170, 2],
+    ['Cámara Retrovisor para Auto Ecopower EP-8777 con Doble Cámara Full HD', 'Ecopower', 'Tecnología', 50, 220, 1],
+    ['Cámara DVR para Auto Ecopower EP-8775 Full HD con Cámara Trasera', 'Ecopower', 'Tecnología', 50, 170, 2],
+    ['Fuente Bebedero para Gatos SATE A-MF8271 con Filtro – 1,8 Litros', 'Satellite', 'Hogar y mascotas', 40, 90, 4],
+    ['Destornillador Eléctrico Recargable SATE A-KS29 con 29 Puntas', 'Satellite', 'Herramientas', 45, 135, 4],
+    ['Caja de Herramientas SATE A-TK884 con Taladro Inalámbrico', 'Satellite', 'Herramientas', 50, 205, 4],
+    ['Auricular Gamer SATE GH-554 con Micrófono y Luces RGB', 'Satellite', 'Audio', 45, 85, 2],
+    ['Aspiradora Portátil y Soplador SATE A-CV1103W Recargable', 'Satellite', 'Hogar y mascotas', 40, 85, 6],
+    ['Trípode para Videos SATE A-RM900K con Luz LED y Micrófono', 'Satellite', 'Foto y video', 48, 112, 2],
+    ['Trípode para Videos SATE A-RM900G con Luz LED y Micrófono', 'Satellite', 'Foto y video', 48, 112, 2],
+    ['Palo de Selfie con Trípode y Control Inalámbrico SATE A-RM800D', 'Satellite', 'Foto y video', 48, 172, 2],
+    ['Máquina de Boxeo Musical SATE A-MLB11 con Bluetooth y Guantes', 'Satellite', 'Juegos', 47, 208, 3],
+    ['Mini Motosierra Recargable SATE A-TK881 con 2 Baterías', 'Satellite', 'Herramientas', 60, 230, 2],
+    ['Kit Gamer Satellite GK-54 RGB – 5 en 1', 'Satellite', 'Tecnología', 65, 195, 3],
+    ['Drone Plegable con Cámara HD, Wi-Fi y Estuche', '', 'Drones', 55, 95, 4],
+    ['Drone Avión con Cámara HD, Luces LED y 2 Baterías', '', 'Drones', 50, 90, 4],
+    ['Dron Cuadricóptero LUK con Cámara HD y 2 Baterías', 'LUK', 'Drones', 55, 115, 6],
+    ['Mini Drone Quadricóptero Plegable con Cámara', '', 'Drones', 55, 95, 5],
+    ['Drone Quadricóptero con Cámara HD y Control con Pantalla', '', 'Drones', 75, 145, 5],
+    ['Tabla de Boxeo Musical Interactiva con Luces y Guantes', '', 'Juegos', 45, 105, 5],
+    ['Auto Acrobático a Control Remoto con Luces LED, Música y Giro 360°', '', 'Vehículos RC', 50, 95, 6],
+    ['Titanic Armable con Bloques – 607 piezas', '', 'Bloques y armables', 35, 45, 8],
+    ['Auto Deportivo Armable con Bloques – Escala 1:14', '', 'Bloques y armables', 55, 135, 1],
+    ['Estadio Santiago Bernabéu – 101 piezas - Puzzle 3D', '', 'Bloques y armables', 55, 65, 9],
+    ['SPEAKER ECOPOWER EP-S107', 'Ecopower', 'Audio', 45, 215, 2],
+    ['Speaker Ecopower EP-1960 6.5" 60 W Bluetooth - Negro', 'Ecopower', 'Audio', 100, 435, 2],
+    ['WALKIE TALKIE LUO LU-820S', 'LUO', 'Tecnología', 55, 140, 3],
+    ['SMARTWATCH LUO W8 ULTRA - 49MM - NARANJA', 'LUO', 'Tecnología', 40, 80, 2],
+    ['SPEAKER ASTRONAUTA CON LED LU-2111', 'LUO', 'Audio', 40, 105, 2],
+    ['CARGADOR PORTATIL DE 33.000 mAh - ECOPOWER / EP-C838', 'Ecopower', 'Tecnología', 50, 140, 4],
+    ['CAMARA INFANTIL LUO LU-X209 / CON DISPLAY / AZUL', 'LUO', 'Foto y video', 50, 80, 2],
+    ['Auricular Con Bluetooth Recargable Diseño Infantil / LU-993', 'LUO', 'Audio', 40, 90, 2],
+    ['AURICULAR INALÁMBRICO ECOPOWER EP-H150', 'Ecopower', 'Audio', 44, 76, 3],
+    ['CORTA PELO EP-2811 ECOPOWER', 'Ecopower', 'Cuidado personal', 65, 195, 2]
+  ];
+  imgs = [7, 6, 62, 61, 60, 59, 58, 57, 56, 55, 54, 53, 52, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 37, 36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, 16, 38, 15, 14, 13, 12, 11, 10, 9, 8, 5, 4, 3, 2, 1];
+  catalog = this.raw.map(([name, brand, category, gan, may, stock, feat], i) => ({ name, brand, category, price: (may + gan) * 1000, wholesale: may * 1000, stock, featured: !!feat, img: 'img/' + String(this.imgs[i]).padStart(2, '0') + '.webp' }));
+  gs(n) { return 'Gs. ' + n.toLocaleString('es-PY'); }
+  toggleIn(key, v) { this.setState(s => ({ [key]: s[key].includes(v) ? s[key].filter(x => x !== v) : s[key].concat(v) })); }
+  searchRef = React.createRef();
+  footerRef = React.createRef();
+  aboutRef = React.createRef();
+  observeAbout() {
+    const el = this.aboutRef.current;
+    if (!el || el === this.aboutObserved) return;
+    if (!this.aboutIo) this.aboutIo = new IntersectionObserver(([e]) => { if (e.isIntersecting) this.setState({ aboutIn: true }); }, { threshold: 0.2 });
+    if (this.aboutObserved) this.aboutIo.unobserve(this.aboutObserved);
+    this.aboutIo.observe(el);
+    this.aboutObserved = el;
+  }
+  componentDidMount() {
+    this.io = new IntersectionObserver(([e]) => this.setState({ footerVisible: e.isIntersecting }), { threshold: 0 });
+    this.observeFooter();
+    this.observeAbout();
+    this.onScroll = () => {
+      const s = window.scrollY > 24;
+      const past = window.scrollY > window.innerHeight * 0.75;
+      if (s !== this.state.scrolled || past !== this.state.pastHero) this.setState({ scrolled: s, pastHero: past });
+    };
+    window.addEventListener('scroll', this.onScroll, { passive: true });
+    this.onKey = (e) => { if (e.key === 'Escape') this.setState({ searchOpen: false, menuOpen: false, megaOpen: false }); };
+    window.addEventListener('keydown', this.onKey);
+  }
+  observeFooter() { const el = this.footerRef.current; if (el && el !== this.observed) { if (this.observed) this.io.unobserve(this.observed); this.io.observe(el); this.observed = el; } }
+  componentWillUnmount() { window.removeEventListener('scroll', this.onScroll); window.removeEventListener('keydown', this.onKey); this.io.disconnect(); if (this.aboutIo) this.aboutIo.disconnect(); }
+  componentDidUpdate(_, prev) { this.observeFooter(); this.observeAbout(); if (this.state.searchOpen && !prev.searchOpen && this.searchRef.current) this.searchRef.current.focus(); }
+  icon(d) {
+    return React.createElement('svg', { width: 26, height: 26, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' },
+      d.map((p, i) => React.createElement('path', { key: i, d: p })));
+  }
+  renderVals() {
+    const { scrolled, megaOpen } = this.state;
+    const number = (this.props.whatsappNumber ?? '').replace(/\D/g, '');
+    const headlines = {
+      encontrar: ['Encontrá eso que estabas', 'buscando.'],
+      necesitas: ['Lo necesitás.', 'Lo encontrás.'],
+      casa: ['De tu casa a tu tecnología,', 'todo pasa por MG.']
+    };
+    const { view, cats, brands, minPrice, maxPrice, sort, sortOpen, onlyStock, onlyOffer } = this.state;
+    const MAXP = 600000;
+    const box = (on) => ({ width: 18, height: 18, flex: '0 0 18px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', border: on ? '2px solid #1B49D6' : '2px solid #C9D1E3', background: on ? '#1B49D6' : '#fff', transition: 'background .2s,border-color .2s' });
+    const sortList = [['relevancia', 'Relevancia'], ['menor', 'Menor precio'], ['mayor', 'Mayor precio'], ['nombre', 'Nombre A–Z']];
+    const isCatalog = view === 'catalog';
+    const chipStyle = (on) => ({ height: 36, padding: '0 12px', border: on ? '2px solid #1B49D6' : '1px solid #E3E7F0', background: on ? '#EEF2FD' : '#fff', color: on ? '#1B49D6' : '#0F1633', fontSize: 13, fontWeight: 700, cursor: 'pointer' });
+    const allCats = ['Drones', 'Vehículos RC', 'Bloques y armables', 'Juegos', 'Tecnología', 'Audio', 'Foto y video', 'Herramientas', 'Hogar y mascotas', 'Cuidado personal'];
+    const allBrands = [...new Set(this.catalog.map(p => p.brand).filter(Boolean))].sort();
+    let list = this.catalog.filter(p => (!cats.length || cats.includes(p.category)) && (!brands.length || brands.includes(p.brand)) && p.price >= minPrice && p.price <= maxPrice && (!onlyStock || p.stock > 0) && (!onlyOffer || p.featured));
+    if (sort === 'relevancia') list = [...list].sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+    if (sort === 'menor') list = [...list].sort((a, b) => a.price - b.price);
+    if (sort === 'mayor') list = [...list].sort((a, b) => b.price - a.price);
+    if (sort === 'nombre') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
+    const products = list.map((p, i) => ({ ...p, slotId: 'prod-' + this.catalog.indexOf(p), brandUpper: (p.brand || p.category).toUpperCase(), showCategory: !!p.brand, priceLabel: this.gs(p.price), stockLabel: p.stock + ' disp.', noStock: p.stock === 0, delay: Math.min(i, 12) * 0.035 + 's' }));
+    const gridView = this.state.gridView || '4col';
+    const views = [['list', 'Lista'], ['2col', '2 columnas'], ['4col', '4 columnas']];
+    const ht = this.state.hoverTile;
+    const arrow = (k) => ({ display: 'inline-block', transition: 'transform .35s cubic-bezier(.22,.9,.2,1)', transform: ht === k ? 'rotate(-45deg) translate(2px,-1px)' : 'none' });
+    const presets = [[150000, 'Hasta Gs. 150.000'], [300000, 'Hasta Gs. 300.000'], [600000, 'Todos']];
+    const activeChips = [
+      ...cats.map(c => ({ label: c, remove: () => this.toggleIn('cats', c) })),
+      ...brands.map(b => ({ label: b, remove: () => this.toggleIn('brands', b) })),
+      ...(minPrice > 0 || maxPrice < MAXP ? [{ label: this.gs(minPrice) + ' – ' + this.gs(maxPrice), remove: () => this.setState({ minPrice: 0, maxPrice: MAXP }) }] : []),
+      ...(onlyStock ? [{ label: 'Con stock', remove: () => this.setState({ onlyStock: false }) }] : []),
+      ...(onlyOffer ? [{ label: 'Destacados', remove: () => this.setState({ onlyOffer: false }) }] : [])
+    ];
+    const go = (v) => (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: v, megaOpen: false, menuOpen: false }); window.scrollTo({ top: 0 }); };
+    return {
+      isCatalog, isHome: view === 'home', isAbout: view === 'about',
+      goAbout: go('about'), goAboutClose: go('about'),
+      aboutLinkStyle: { color: view === 'about' ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: view === 'about' ? '2px solid #1B49D6' : '2px solid transparent' },
+      goHome: go('home'), goCatalog: go('catalog'), goHomeClose: go('home'), goCatalogClose: go('catalog'),
+      goOffers: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: 'catalog', onlyOffer: true, megaOpen: false, menuOpen: false }); window.scrollTo({ top: 0 }); },
+      offersLinkStyle: { color: isCatalog && onlyOffer ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: isCatalog && onlyOffer ? '2px solid #1B49D6' : '2px solid transparent' },
+      catalogLinkStyle: { color: isCatalog ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: isCatalog ? '2px solid #1B49D6' : '2px solid transparent' },
+      resultLabel: products.length === 1 ? '1 producto' : products.length + ' productos',
+      sortOpen, toggleSort: () => this.setState(s => ({ sortOpen: !s.sortOpen })),
+      sortLabel: sortList.find(o => o[0] === sort)[1],
+      sortBtnStyle: { display: 'inline-flex', alignItems: 'center', gap: 10, height: 44, padding: '0 14px', border: sortOpen ? '2px solid #1B49D6' : '2px solid #0B1F5F', background: '#fff', color: '#0B1F5F', fontSize: 14, fontWeight: 700, cursor: 'pointer' },
+      sortOptions: sortList.map(([v, label]) => ({ label, on: v === sort, pick: () => this.setState({ sort: v, sortOpen: false }), style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, minHeight: 44, padding: '0 14px', border: 0, borderBottom: '1px solid #E3E7F0', background: v === sort ? '#EEF2FD' : '#fff', color: v === sort ? '#1B49D6' : '#0F1633', fontSize: 14, fontWeight: 700, cursor: 'pointer', textAlign: 'left' } })),
+      catFilters: allCats.map(c => ({ name: c, on: cats.includes(c), toggle: () => this.toggleIn('cats', c), boxStyle: box(cats.includes(c)) })),
+      flagFilters: [
+        { name: 'Solo con stock', on: onlyStock, toggle: () => this.setState(s => ({ onlyStock: !s.onlyStock })), boxStyle: box(onlyStock) },
+        { name: 'Solo destacados', on: onlyOffer, toggle: () => this.setState(s => ({ onlyOffer: !s.onlyOffer })), boxStyle: box(onlyOffer) }
+      ],
+      minPrice, minPriceLabel: this.gs(minPrice),
+      setMinPrice: (e) => this.setState(s => ({ minPrice: Math.min(Number(e.target.value), s.maxPrice - 10000) })),
+      rangeFillStyle: { position: 'absolute', top: 20, height: 4, background: '#1B49D6', left: (minPrice / MAXP * 100) + '%', right: (100 - maxPrice / MAXP * 100) + '%' },
+      brandTiles: [
+        ['Ecopower', 'logos/ecopower.jpeg', 0],
+        ['Satellite', 'logos/sate.png', 1],
+        ['LUO', 'logos/luo.png', 0],
+        ['Mould King', 'logos/mouldking.jpeg', 0],
+        ['Jie Star', 'logos/jiestar.webp', 0],
+        ['Apengbaol', 'logos/apengbaol.png', 0],
+        ['LUK', 'logos/luk.png', 0]
+      ].map(([b, img, onDark]) => {
+        const n = this.catalog.filter(p => p.brand === b).length;
+        return {
+          name: b, img, meta: n === 1 ? '1 producto' : n + ' productos',
+          panelStyle: { height: 132, background: onDark ? '#0B1F5F' : b === 'Mould King' ? '#F8F8F8' : '#F3F5FA', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '18px 26px' },
+          imgStyle: { maxWidth: '100%', maxHeight: '100%', objectFit: 'contain', mixBlendMode: onDark ? 'normal' : 'multiply' },
+          go: (e) => { e.preventDefault(); this.setState({ view: 'catalog', brands: allBrands.includes(b) ? [b] : [], megaOpen: false }); window.scrollTo({ top: 0 }); }
+        };
+      }),
+      footerStyle: view !== 'home' ? { background: '#0B1F5F', color: '#fff' } : { background: '#fff', borderTop: '2px solid #0B1F5F', color: '#0F1633' },
+      footerHeadStyle: { fontSize: 11, fontWeight: 800, letterSpacing: '.1em', color: view !== 'home' ? '#4ED962' : '#0B1F5F', marginBottom: 4 },
+      footerLinkStyle: { fontSize: 14, color: view !== 'home' ? 'rgba(255,255,255,.86)' : '#0F1633', padding: '4px 0', display: 'block', minHeight: 28, transition: 'color .2s' },
+      footerBarStyle: { borderTop: view !== 'home' ? '1px solid rgba(255,255,255,.2)' : '1px solid #E3E7F0' },
+      footerMutedStyle: { fontSize: 12, color: view !== 'home' ? 'rgba(255,255,255,.7)' : '#5B6480' },
+      footerNeuraStyle: { color: view !== 'home' ? '#fff' : '#0B1F5F', fontWeight: 700, minHeight: 28, display: 'inline-flex', alignItems: 'center' },
+      showFooterLogo: view === 'home',
+      footerTagline: view !== 'home' ? 'color:rgba(255,255,255,.75)' : 'color:#5B6480',
+      footerMuted: view !== 'home' ? 'font-size:12px;color:rgba(255,255,255,.7)' : 'font-size:12px;color:#5B6480',
+      brandFilters: allBrands.map(b => ({ name: b, toggle: () => this.toggleIn('brands', b), style: chipStyle(brands.includes(b)) })),
+      maxPrice, maxPriceLabel: this.gs(maxPrice), setMaxPrice: (e) => this.setState(s => ({ maxPrice: Math.max(Number(e.target.value), s.minPrice + 10000) })),
+      pricePresets: presets.map(([v, label]) => ({ label, apply: () => this.setState({ minPrice: 0, maxPrice: v }), style: chipStyle(minPrice === 0 && maxPrice === v) })),
+      clearFilters: () => this.setState({ cats: [], brands: [], minPrice: 0, maxPrice: MAXP, onlyStock: false, onlyOffer: false, sort: 'relevancia' }),
+      arrowTools: arrow('tools'), arrowGames: arrow('games'), arrowBlocks: arrow('blocks'), arrowBrands: arrow('brands'),
+      inBrands: () => this.setState({ hoverTile: 'brands' }),
+      inTools: () => this.setState({ hoverTile: 'tools' }),
+      inGames: () => this.setState({ hoverTile: 'games' }),
+      inBlocks: () => this.setState({ hoverTile: 'blocks' }),
+      outTile: () => this.setState({ hoverTile: null }),
+      activeChips, products, hasResults: products.length > 0, noResults: products.length === 0,
+      gridView,
+      gridCols: gridView === 'list' ? 'minmax(0,1fr)' : gridView === '2col' ? 'repeat(2,minmax(0,1fr))' : 'repeat(4,minmax(0,1fr))',
+      cardDir: gridView === 'list' ? 'row' : 'column',
+      mediaSize: gridView === 'list' ? 'flex:0 0 190px;min-height:190px;border-right:1px solid #E3E7F0' : 'aspect-ratio:1/1;border-bottom:1px solid #E3E7F0',
+      viewOptions: views.map(([v, label]) => ({
+        label, on: v === gridView,
+        pick: () => this.setState({ gridView: v }),
+        style: { height: 36, padding: '0 12px', border: 0, background: v === gridView ? '#0B1F5F' : '#fff', color: v === gridView ? '#fff' : '#0F1633', fontSize: 12, fontWeight: 700, cursor: 'pointer', transition: 'background .2s,color .2s' }
+      })),
+      showTopBar: this.props.showTopBar ?? true,
+      heroTitleLead: (headlines[this.props.heroHeadline] ?? headlines.encontrar)[0],
+      heroTitleInk: (headlines[this.props.heroHeadline] ?? headlines.encontrar)[1],
+      waHref: number ? `https://wa.me/${number}` : '#',
+      footerRef: this.footerRef,
+      waStyle: { position: 'fixed', right: 28, bottom: 28, zIndex: 60, display: 'flex', alignItems: 'center', gap: 10, height: 52, padding: '0 18px 0 14px', background: '#1EB531', color: '#fff', fontWeight: 700, fontSize: 14, boxShadow: '0 12px 30px -12px rgba(30,181,49,.7)', transition: 'background .2s, opacity .25s, transform .25s', opacity: this.state.footerVisible || !this.state.pastHero ? 0 : 1, transform: this.state.footerVisible || !this.state.pastHero ? 'translateY(12px)' : 'none', pointerEvents: this.state.footerVisible || !this.state.pastHero ? 'none' : 'auto' },
+      headerStyle: {
+        position: 'sticky', top: 0, zIndex: 50,
+        background: scrolled || megaOpen ? 'rgba(255,255,255,.96)' : 'transparent',
+        backdropFilter: scrolled || megaOpen ? 'blur(6px)' : 'none',
+        borderBottom: scrolled || megaOpen ? '1px solid #E3E7F0' : '1px solid transparent',
+        transition: 'background .3s, border-color .3s'
+      },
+      megaLinkStyle: { color: megaOpen ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: megaOpen ? '2px solid #1B49D6' : '2px solid transparent' },
+      megaOpen, searchOpen: this.state.searchOpen, menuOpen: this.state.menuOpen,
+      openMega: () => this.setState({ megaOpen: true }),
+      closeMega: () => this.setState({ megaOpen: false }),
+      openSearch: () => this.setState({ searchOpen: true, megaOpen: false }),
+      closeSearch: () => this.setState({ searchOpen: false }),
+      openMenu: () => this.setState({ menuOpen: true }),
+      closeMenu: () => this.setState({ menuOpen: false }),
+      preventSubmit: (e) => e.preventDefault(),
+      searchRef: this.searchRef,
+      categories: [
+        { name: 'Juguetes', items: ['Drones', 'Vehículos RC', 'Bloques y armables', 'Juegos'] },
+        { name: 'Tecnología', items: ['Speakers', 'Auriculares', 'Smartwatch', 'Cámaras'] },
+        { name: 'Foto y video', items: ['Trípodes', 'Aros de luz', 'Cámaras infantiles'] },
+        { name: 'Herramientas y hogar', items: ['Herramientas', 'Hogar y mascotas', 'Cuidado personal'] }
+      ],
+      popular: ['Drones', 'Bloques para armar', 'Control remoto', 'Speakers'],
+      aboutRef: this.aboutRef,
+      aboutCards: [
+        ['01', 'Catálogo curado', 'Cada producto entra a la tienda porque lo probamos y sabemos qué esperar de él.'],
+        ['02', 'Stock a la vista', 'Publicamos las unidades disponibles en cada producto, sin sorpresas al cerrar la compra.'],
+        ['03', 'Atención directa', 'Escribís por WhatsApp y te responde una persona, no un formulario.'],
+        ['04', 'Envíos a todo el país', 'Coordinamos la entrega según dónde estés y te avisamos cuando sale.']
+      ].map(([num, title, text], i) => ({
+        num, title, text,
+        style: {
+          display: 'flex', flexDirection: 'column', gap: 8, padding: 22,
+          background: 'rgba(255,255,255,.06)', border: '1px solid rgba(255,255,255,.18)',
+          transition: 'opacity .6s ease, transform .6s cubic-bezier(.22,.9,.2,1), background .25s, border-color .25s',
+          transitionDelay: (i * 0.09) + 's',
+          opacity: this.state.aboutIn ? 1 : 0,
+          transform: this.state.aboutIn ? 'none' : 'translateY(22px)'
+        }
+      })),
+      benefits: [
+        { title: 'Compra simple', text: 'Todo diseñado para llegar a lo que buscás rápidamente.', icon: this.icon(['M5 12h14', 'm12 5 7 7-7 7']) },
+        { title: 'Atención cercana', text: 'Una tienda digital sin perder el trato humano.', icon: this.icon(['M7.9 20A9 9 0 1 0 4 16.1L2 22Z']) },
+        { title: 'Variedad', text: 'Diferentes categorías dentro de una misma experiencia.', icon: this.icon(['m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z', 'm22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65', 'm22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65']) },
+        { title: 'Compra segura', text: 'Una experiencia clara desde el inicio hasta la entrega.', icon: this.icon(['M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z', 'm9 12 2 2 4-4']) }
+      ],
+      footerCols: [
+        { title: 'COMPRAR', links: [
+          { label: 'Catálogo', href: '#catalogo', go: go('catalog') },
+          { label: 'Categorías', href: '#catalogo', go: go('catalog') },
+          { label: 'Ofertas', href: '#catalogo', go: (e) => { e.preventDefault(); this.setState({ view: 'catalog', onlyOffer: true }); window.scrollTo({ top: 0 }); } }
+        ] },
+        { title: 'INFORMACIÓN', links: ['Nosotros', 'Preguntas frecuentes', 'Envíos', 'Cambios y devoluciones'].map(l => ({ label: l, href: '#nosotros', go: go('about') })) },
+        { title: 'CONTACTO', links: ['WhatsApp', 'Instagram', 'Facebook'].map(l => ({ label: l, href: '#' })) }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

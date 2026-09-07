@@ -35,6 +35,8 @@
     @media (min-width:901px) and (max-width:1200px){[data-grid="products"][data-view="4col"]{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
     @media (max-width:900px){[data-grid="products"]{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}}
     @keyframes mgMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+    @keyframes mgSlideIn{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+    @keyframes mgCartFlash{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
     @media (max-width:900px){
       [data-m~="hide"]{display:none!important}
       [data-m~="show"]{display:flex!important}
@@ -208,8 +210,9 @@
         <a data-m="hide" href="{{ waHref }}" target="_blank" rel="noopener" aria-label="WhatsApp" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;color:#1EB531;transition:background .2s" style-hover="background:#EAF8EC">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
         </a>
-        <button aria-label="Carrito" style="display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:#0F1633;cursor:pointer;transition:background .2s" style-hover="background:#F3F5FA">
+        <button onClick="{{ openCart }}" aria-label="Carrito" style="position:relative;display:flex;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:#0F1633;cursor:pointer;transition:background .2s" style-hover="background:#F3F5FA">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+          <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position:absolute;top:4px;right:4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:#1EB531;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 0 0 2px #fff">{{ cartCountLabel }}</span></sc-if>
         </button>
         <button data-m="show" onClick="{{ openMenu }}" aria-label="Menú" style="display:none;align-items:center;justify-content:center;width:44px;height:44px;border:0;background:transparent;color:#0F1633;cursor:pointer">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"></path></svg>
@@ -344,7 +347,7 @@
                     <div style="font-size:18px;font-weight:800;color:#0B1F5F">{{ p.priceLabel }}</div>
                     <div style="font-size:12px;font-weight:700;color:#5B6480;white-space:nowrap">{{ p.stockLabel }}</div>
                   </div>
-                  <button style="margin-top:8px;height:44px;border:2px solid #0B1F5F;background:#fff;color:#0B1F5F;font-weight:700;font-size:14px;cursor:pointer;text-align:left;padding:0 14px;transition:background .2s,color .2s" style-hover="background:#0B1F5F;color:#fff">Agregar al carrito</button>
+                  <button onClick="{{ p.addToCart }}" style="{{ p.addBtnStyle }}" aria-label="Agregar {{ p.name }} al carrito">{{ p.addLabel }}</button>
                 </div>
               </article>
             </sc-for>
@@ -646,11 +649,70 @@
     </div>
   </div>
   </sc-if>
+
+  <!-- cart drawer -->
+  <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:120;display:flex;justify-content:flex-end;animation:mgUp .2s ease both">
+    <div onClick="{{ closeCart }}" style="position:absolute;inset:0;background:rgba(7,20,51,.55);backdrop-filter:blur(2px)"></div>
+    <aside style="position:relative;width:min(440px,100vw);max-width:100%;background:#fff;display:flex;flex-direction:column;box-shadow:-20px 0 40px -20px rgba(11,31,95,.35);animation:mgSlideIn .3s cubic-bezier(.22,1,.36,1) both">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:18px 20px;border-bottom:2px solid #0B1F5F">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="font-size:20px;font-weight:800;color:#0B1F5F;letter-spacing:-.02em">Tu carrito</div>
+          <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ false }}"><span style="background:#0B1F5F;color:#fff;font-size:12px;font-weight:800;padding:3px 8px;border-radius:10px">{{ cartCountLabel }}</span></sc-if>
+        </div>
+        <button onClick="{{ closeCart }}" aria-label="Cerrar" style="width:40px;height:40px;border:0;background:transparent;cursor:pointer;color:#0F1633"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+      </div>
+      <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ true }}">
+      <div style="flex:1;overflow-y:auto;padding:8px 16px;display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ cartItems }}" as="it" hint-placeholder-count="2">
+          <div style="display:grid;grid-template-columns:72px 1fr auto;gap:12px;padding:12px 4px;border-bottom:1px solid #E3E7F0;align-items:center">
+            <div style="width:72px;height:72px;background:#F3F5FA;display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="{{ it.img }}" alt="{{ it.name }}" loading="lazy" style="max-width:84%;max-height:84%;object-fit:contain;mix-blend-mode:multiply" /></div>
+            <div style="min-width:0;display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:13px;font-weight:700;color:#0F1633;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{ it.name }}</div>
+              <div style="display:flex;align-items:center;gap:6px">
+                <button onClick="{{ it.minus }}" aria-label="Menos" style="width:28px;height:28px;border:1.5px solid #C9D1E3;background:#fff;color:#0B1F5F;font-size:15px;font-weight:800;cursor:pointer;line-height:1;padding:0">−</button>
+                <span style="min-width:28px;text-align:center;font-size:14px;font-weight:700;color:#0F1633">{{ it.qty }}</span>
+                <button onClick="{{ it.plus }}" aria-label="Más" style="width:28px;height:28px;border:1.5px solid #C9D1E3;background:#fff;color:#0B1F5F;font-size:15px;font-weight:800;cursor:pointer;line-height:1;padding:0">+</button>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+              <div style="font-size:14px;font-weight:800;color:#0B1F5F;white-space:nowrap">{{ it.subtotalLabel }}</div>
+              <button onClick="{{ it.remove }}" aria-label="Quitar" style="border:0;background:transparent;font-size:12px;font-weight:700;color:#5B6480;cursor:pointer;padding:2px 4px" style-hover="color:#EC3013">Quitar</button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="border-top:2px solid #0B1F5F;padding:18px 20px 22px;background:#F8F9FC;display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <div style="font-size:13px;font-weight:700;color:#5B6480;letter-spacing:.02em">Total</div>
+          <div style="font-size:22px;font-weight:800;color:#0B1F5F">{{ cartTotalLabel }}</div>
+        </div>
+        <button onClick="{{ checkoutWhatsApp }}" style="display:flex;align-items:center;justify-content:center;gap:10px;height:54px;border:0;background:#1EB531;color:#fff;font-weight:800;font-size:15px;cursor:pointer;transition:background .2s" style-hover="background:#17A62B">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"></path></svg>
+          Comprar por WhatsApp
+        </button>
+        <div style="display:flex;justify-content:space-between;font-size:12px;color:#5B6480">
+          <button onClick="{{ closeCart }}" style="border:0;background:transparent;color:#0B1F5F;font-weight:700;cursor:pointer;padding:4px 0;text-decoration:underline">Seguir viendo</button>
+          <button onClick="{{ clearCartClick }}" style="border:0;background:transparent;color:#5B6480;font-weight:700;cursor:pointer;padding:4px 0">Vaciar carrito</button>
+        </div>
+      </div>
+      </sc-if>
+      <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ false }}">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:40px 24px;text-align:center;color:#5B6480">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#C9D1E3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="21" r="1"></circle><circle cx="19" cy="21" r="1"></circle><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"></path></svg>
+        <div style="font-size:16px;font-weight:800;color:#0B1F5F">Tu carrito está vacío</div>
+        <div style="font-size:14px;max-width:28ch;line-height:1.45">Agregá productos y coordinamos la compra por WhatsApp.</div>
+        <button onClick="{{ closeCart }}" style="margin-top:4px;height:44px;padding:0 20px;border:2px solid #0B1F5F;background:#fff;color:#0B1F5F;font-weight:700;font-size:14px;cursor:pointer" style-hover="background:#0B1F5F;color:#fff">Ver catálogo</button>
+      </div>
+      </sc-if>
+    </aside>
+  </div>
+  </sc-if>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;whatsappNumber&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contacto&quot;},&quot;showTopBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;heroHeadline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;encontrar&quot;,&quot;options&quot;:[&quot;encontrar&quot;,&quot;necesitas&quot;,&quot;casa&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
 class Component extends DCLogic {
-  state = { scrolled: false, megaOpen: false, searchOpen: false, menuOpen: false, view: 'home', cats: [], brands: [], minPrice: 0, maxPrice: 600000, sort: 'relevancia', sortOpen: false, onlyStock: false, onlyOffer: false };
+  state = { scrolled: false, megaOpen: false, searchOpen: false, menuOpen: false, view: 'home', cats: [], brands: [], minPrice: 0, maxPrice: 600000, sort: 'relevancia', sortOpen: false, onlyStock: false, onlyOffer: false, cart: {}, cartOpen: false, cartFlash: 0 };
   raw = [
     ['Mini Masajeador Portatil Ecopower', 'Ecopower', 'Cuidado personal', 40, 90, 18, 1],
     ['Linterna + Kit de herramientas Ecopower', 'Ecopower', 'Herramientas', 50, 100, 18, 1],
@@ -719,6 +781,38 @@ class Component extends DCLogic {
   catalog = this.raw.map(([name, brand, category, gan, may, stock, feat], i) => ({ name, brand, category, price: (may + gan) * 1000, wholesale: may * 1000, stock, featured: !!feat, img: 'img/' + String(this.imgs[i]).padStart(2, '0') + '.webp' }));
   gs(n) { return 'Gs. ' + n.toLocaleString('es-PY'); }
   toggleIn(key, v) { this.setState(s => ({ [key]: s[key].includes(v) ? s[key].filter(x => x !== v) : s[key].concat(v) })); }
+  saveCart(cart) {
+    try { localStorage.setItem('mg_cart', JSON.stringify(cart)); } catch (e) {}
+  }
+  addToCart(name, stock) {
+    this.setState(s => {
+      const cur = s.cart[name] || 0;
+      const cap = Math.max(1, Number(stock) || 99);
+      const next = Math.min(cur + 1, cap);
+      const cart = { ...s.cart, [name]: next };
+      this.saveCart(cart);
+      return { cart, cartFlash: Date.now() };
+    });
+  }
+  updateCartQty(name, qty, stock) {
+    this.setState(s => {
+      const cart = { ...s.cart };
+      const cap = Math.max(1, Number(stock) || 99);
+      const q = Math.max(0, Math.min(Number(qty) || 0, cap));
+      if (q === 0) delete cart[name]; else cart[name] = q;
+      this.saveCart(cart);
+      return { cart };
+    });
+  }
+  removeFromCart(name) {
+    this.setState(s => {
+      const cart = { ...s.cart };
+      delete cart[name];
+      this.saveCart(cart);
+      return { cart };
+    });
+  }
+  clearCart() { this.setState({ cart: {} }); this.saveCart({}); }
   searchRef = React.createRef();
   footerRef = React.createRef();
   aboutRef = React.createRef();
@@ -731,6 +825,10 @@ class Component extends DCLogic {
     this.aboutObserved = el;
   }
   componentDidMount() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('mg_cart') || '{}');
+      if (saved && typeof saved === 'object') this.setState({ cart: saved });
+    } catch (e) {}
     this.io = new IntersectionObserver(([e]) => this.setState({ footerVisible: e.isIntersecting }), { threshold: 0 });
     this.observeFooter();
     this.observeAbout();
@@ -752,7 +850,7 @@ class Component extends DCLogic {
   }
   renderVals() {
     const { scrolled, megaOpen } = this.state;
-    const number = (this.props.whatsappNumber ?? '').replace(/\D/g, '');
+    const number = ((this.props.whatsappNumber ?? '') || '595971298981').replace(/\D/g, '');
     const headlines = {
       encontrar: ['Encontrá eso que estabas', 'buscando.'],
       necesitas: ['Lo necesitás.', 'Lo encontrás.'],
@@ -771,7 +869,25 @@ class Component extends DCLogic {
     if (sort === 'menor') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'mayor') list = [...list].sort((a, b) => b.price - a.price);
     if (sort === 'nombre') list = [...list].sort((a, b) => a.name.localeCompare(b.name));
-    const products = list.map((p, i) => ({ ...p, slotId: 'prod-' + this.catalog.indexOf(p), brandUpper: (p.brand || p.category).toUpperCase(), showCategory: !!p.brand, priceLabel: this.gs(p.price), stockLabel: p.stock + ' disp.', noStock: p.stock === 0, delay: Math.min(i, 12) * 0.035 + 's' }));
+    const products = list.map((p, i) => {
+      const inCart = (this.state.cart[p.name] || 0) > 0;
+      return {
+        ...p, slotId: 'prod-' + this.catalog.indexOf(p),
+        brandUpper: (p.brand || p.category).toUpperCase(),
+        showCategory: !!p.brand, priceLabel: this.gs(p.price),
+        stockLabel: p.stock + ' disp.', noStock: p.stock === 0,
+        delay: Math.min(i, 12) * 0.035 + 's',
+        addToCart: (e) => { if (e && e.preventDefault) e.preventDefault(); if (p.stock > 0) this.addToCart(p.name, p.stock); },
+        inCart, addLabel: p.stock === 0 ? 'Sin stock' : inCart ? '✓ En el carrito' : 'Agregar al carrito',
+        addBtnStyle: {
+          marginTop: 8, height: 44, border: '2px solid ' + (inCart ? '#1EB531' : '#0B1F5F'),
+          background: p.stock === 0 ? '#F3F5FA' : (inCart ? '#1EB531' : '#fff'),
+          color: p.stock === 0 ? '#5B6480' : (inCart ? '#fff' : '#0B1F5F'),
+          fontWeight: 700, fontSize: 14, cursor: p.stock === 0 ? 'not-allowed' : 'pointer',
+          textAlign: 'left', padding: '0 14px', transition: 'background .2s, color .2s, border-color .2s'
+        }
+      };
+    });
     const gridView = this.state.gridView || '4col';
     const views = [['list', 'Lista'], ['2col', '2 columnas'], ['4col', '4 columnas']];
     const ht = this.state.hoverTile;
@@ -886,6 +1002,48 @@ class Component extends DCLogic {
       closeSearch: () => this.setState({ searchOpen: false }),
       openMenu: () => this.setState({ menuOpen: true }),
       closeMenu: () => this.setState({ menuOpen: false }),
+      // Cart wiring
+      cartOpen: this.state.cartOpen,
+      cartFlashOn: !!this.state.cartFlash && (Date.now() - this.state.cartFlash) < 900,
+      cartCount: Object.values(this.state.cart).reduce((a, b) => a + b, 0),
+      cartCountLabel: (() => { const n = Object.values(this.state.cart).reduce((a, b) => a + b, 0); return n > 99 ? '99+' : String(n); })(),
+      cartHasItems: Object.keys(this.state.cart).length > 0,
+      cartEmpty: Object.keys(this.state.cart).length === 0,
+      cartItems: (() => {
+        const items = [];
+        for (const [name, qty] of Object.entries(this.state.cart)) {
+          const p = this.catalog.find(x => x.name === name);
+          if (!p) continue;
+          const sub = p.price * qty;
+          items.push({
+            name: p.name, brand: p.brand, img: p.img, qty, priceLabel: this.gs(p.price), subtotalLabel: this.gs(sub),
+            stock: p.stock,
+            plus: () => this.addToCart(p.name, p.stock),
+            minus: () => this.updateCartQty(p.name, qty - 1, p.stock),
+            remove: () => this.removeFromCart(p.name),
+            setQty: (e) => this.updateCartQty(p.name, e.target.value, p.stock)
+          });
+        }
+        return items;
+      })(),
+      cartTotalLabel: this.gs(Object.entries(this.state.cart).reduce((sum, [name, qty]) => {
+        const p = this.catalog.find(x => x.name === name); return sum + (p ? p.price * qty : 0);
+      }, 0)),
+      openCart: () => this.setState({ cartOpen: true }),
+      closeCart: () => this.setState({ cartOpen: false }),
+      clearCartClick: () => { if (confirm('¿Vaciar el carrito?')) this.clearCart(); },
+      checkoutWhatsApp: () => {
+        const lines = ['Hola MG Store, quiero comprar:', ''];
+        let total = 0;
+        for (const [name, qty] of Object.entries(this.state.cart)) {
+          const p = this.catalog.find(x => x.name === name); if (!p) continue;
+          const sub = p.price * qty; total += sub;
+          lines.push('• ' + qty + '× ' + p.name + ' — ' + this.gs(sub));
+        }
+        lines.push('', 'Total: ' + this.gs(total));
+        const msg = encodeURIComponent(lines.join('\n'));
+        window.open('https://wa.me/' + number + '?text=' + msg, '_blank', 'noopener');
+      },
       preventSubmit: (e) => e.preventDefault(),
       searchRef: this.searchRef,
       categories: (() => {

@@ -98,6 +98,19 @@
     /* Border Beam — twin comets orbiting the button's border.
        Portado del Motiq BorderBeamPanel a CSS puro. Un solo RAF global
        actualiza --mkbeam-a en <html>; en hover, cada botón le suma boost. */
+    /* Categorías: imágenes uniformes dentro de cada tile */
+    .cattile{position:relative}
+    .catimg{max-width:78%!important;max-height:78%!important;width:auto!important;height:auto!important;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s ease}
+    .cattile:hover .catimg{transform:scale(1.06)}
+
+    /* Por qué MG — cards con hover glow y animación de entrada */
+    .whycard{position:relative;transition:transform .3s ease}
+    .whycard::after{content:'';position:absolute;left:0;bottom:-1px;height:2px;width:0;background:#1EB531;transition:width .5s cubic-bezier(.22,1,.36,1)}
+    .whycard:hover{transform:translateY(-4px)}
+    .whycard:hover::after{width:100%}
+    .whyicon{transition:transform .5s cubic-bezier(.22,1,.36,1)}
+    .whycard:hover .whyicon{transform:translateY(-4px) scale(1.15)}
+
     @property --mkbeam-a { syntax:'<angle>'; inherits:true; initial-value:0deg }
     .beam-btn{position:relative;isolation:isolate}
     .beam-btn::before,.beam-btn::after{content:'';position:absolute;inset:-1px;border-radius:inherit;pointer-events:none;
@@ -213,7 +226,7 @@
             <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#0B1F5F;padding-bottom:8px;border-bottom:2px solid #0B1F5F;margin-bottom:10px">{{ cat.name }}</div>
             <div style="display:flex;flex-direction:column;gap:6px">
               <sc-for list="{{ cat.items }}" as="it" hint-placeholder-count="4">
-                <a href="#catalogo" onClick="{{ goCatalog }}" style="font-size:14px;color:#0F1633;display:block;padding:2px 0;transition:color .2s,transform .2s" style-hover="color:#1B49D6;transform:translateX(4px)">{{ it }}</a>
+                <a href="#catalogo" onClick="{{ it.go }}" style="font-size:14px;color:#0F1633;display:block;padding:2px 0;transition:color .2s,transform .2s" style-hover="color:#1B49D6;transform:translateX(4px)">{{ it.name }}</a>
               </sc-for>
             </div>
           </div>
@@ -390,58 +403,58 @@
 
   <!-- categories -->
   <section id="categorias" style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight mpad">
-    <div data-m="sechead" style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:40px;flex-wrap:wrap">
-      <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F;max-width:18ch;text-wrap:pretty">Todo empieza por una categoría.</h2>
-      <p style="margin:0;color:#5B6480;font-size:16px;max-width:38ch;text-wrap:pretty">Universos de producto pensados para llegar rápido a lo que necesitás.</p>
+    <div data-m="sechead" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:40px">
+      <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F;max-width:22ch;text-wrap:pretty">Todo empieza por una categoría.</h2>
+      <p style="margin:0;color:#5B6480;font-size:16px;max-width:52ch;text-wrap:pretty">Universos de producto pensados para llegar rápido a lo que necesitás.</p>
     </div>
     <div data-m="grid2" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/18.webp" alt="Drones" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.drones }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/18.webp" alt="Drones" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em;color:#0B1F5F">Drones</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Cámara HD, plegables</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/52.webp" alt="Vehículos a control remoto" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.vehiculos }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/52.webp" alt="Vehículos a control remoto" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Vehículos RC</div><div style="font-size:13px;color:#5B6480;margin-top:2px">A control remoto</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/11.webp" alt="Audio" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.audio }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/11.webp" alt="Audio" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Audio</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Speakers, auriculares</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:20px"><img src="img/57.webp" alt="Bloques y armables" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.bloques }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/57.webp" alt="Bloques y armables" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Bloques y armables</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Sets para armar</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;background:#0B1F5F;color:#fff;transition:background .2s,transform .2s" style-hover="background:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/30.webp" alt="Herramientas" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.herramientas }}" style="display:flex;flex-direction:column;overflow:hidden;background:#0B1F5F;color:#fff;transition:background .2s,transform .2s" style-hover="background:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/30.webp" alt="Herramientas" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px"><div style="font-size:18px;font-weight:800">Herramientas</div><div style="font-size:13px;opacity:.75;margin-top:2px">Cuidado y hogar</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/37.webp" alt="Foto y video" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.fotovideo }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/37.webp" alt="Foto y video" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Foto y video</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Trípodes, aros de luz</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;background:#1EB531;color:#fff;transition:background .2s,transform .2s" style-hover="background:#17A62B;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/41.webp" alt="Juegos" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.juegos }}" style="display:flex;flex-direction:column;overflow:hidden;background:#1EB531;color:#fff;transition:background .2s,transform .2s" style-hover="background:#17A62B;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/41.webp" alt="Juegos" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px"><div style="font-size:18px;font-weight:800">Juegos</div><div style="font-size:13px;opacity:.85;margin-top:2px">Para toda la familia</div></div>
       </a>
-      <a href="#catalogo" onClick="{{ goCatalog }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:16px"><img src="img/23.webp" alt="Cuidado personal" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <a href="#catalogo" onClick="{{ goCat.cuidado }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/23.webp" alt="Cuidado personal" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Cuidado personal</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Masaje, higiene</div></div>
       </a>
     </div>
   </section>
 
   <!-- editorial banner -->
-  <section style="background:#0B1F5F;color:#fff;overflow:hidden">
-    <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight mpad">
+  <section style="background:#0B1F5F;color:#fff;overflow:hidden;position:relative">
+    <div style="max-width:1440px;margin:0 auto;padding:80px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight mpad">
       <div style="grid-column:span 5;display:flex;flex-direction:column;gap:24px">
         <h2 data-m="h1" style="margin:0;font-size:clamp(34px,3.6vw,54px);font-weight:800;letter-spacing:-.025em;line-height:1.02;text-wrap:pretty">Algo bueno siempre está por llegar.</h2>
         <p style="margin:0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.78);max-width:42ch;text-wrap:pretty">Nuevas categorías, nuevos productos y oportunidades para encontrar justo lo que necesitás.</p>
         <a href="#categorias" class="beam-btn beam-dark" style="display:inline-flex;align-self:flex-start;align-items:center;height:52px;padding:0 26px;background:#1EB531;color:#fff;font-weight:700;font-size:15px;--beam-c1:#6CBDED;--beam-c2:#4ED962;--beam-thickness:2px;transition:background .2s" style-hover="background:#17A62B"><span>Descubrir MG</span></a>
       </div>
-      <div data-m="viz" style="grid-column:7 / span 6;height:440px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px">
-        <div style="grid-row:span 2;background:#fff;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/23.webp" alt="Mini motosierra recargable" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
-        <div style="background:#fff;display:flex;align-items:center;justify-content:center;padding:14px"><img src="img/09.webp" alt="Smartwatch LUO W8 Ultra" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
-        <div style="background:#fff;display:flex;align-items:center;justify-content:center;padding:14px"><img src="img/44.webp" alt="Bloques magnéticos" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+      <div data-m="viz" style="grid-column:7 / span 6;height:420px;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;overflow:hidden">
+        <div style="grid-row:span 2;background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;padding:22px;overflow:hidden"><img src="img/23.webp" alt="Mini motosierra recargable" style="max-width:82%;max-height:82%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden"><img src="img/09.webp" alt="Smartwatch LUO W8 Ultra" style="max-width:82%;max-height:82%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div style="background:rgba(255,255,255,.94);display:flex;align-items:center;justify-content:center;padding:16px;overflow:hidden"><img src="img/44.webp" alt="Bloques magnéticos" style="max-width:82%;max-height:82%;object-fit:contain;mix-blend-mode:multiply" /></div>
       </div>
     </div>
   </section>
@@ -449,9 +462,9 @@
   <!-- brands -->
   <section id="marcas" style="background:#fff">
     <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight mpad">
-      <div data-m="sechead" style="display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:36px;flex-wrap:wrap">
+      <div data-m="sechead" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:36px">
         <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Nuestras marcas</h2>
-        <p style="margin:0;color:#5B6480;font-size:16px;max-width:40ch;text-wrap:pretty">Trabajamos con marcas que ya conocés y en las que confiás.</p>
+        <p style="margin:0;color:#5B6480;font-size:16px;max-width:52ch;text-wrap:pretty">Trabajamos con marcas que ya conocés y en las que confiás.</p>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px" data-m="brands4">
         <sc-for list="{{ brandTiles }}" as="b" hint-placeholder-count="7">
@@ -477,8 +490,8 @@
     <h2 style="margin:0 0 40px;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Por qué MG</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:2px solid #0B1F5F" data-m="grid2">
       <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="4">
-        <div style="padding:28px 24px 32px 0;border-bottom:1px solid #B8DFC0;display:flex;flex-direction:column;gap:14px">
-          <div style="color:#1EB531">{{ b.icon }}</div>
+        <div class="whycard" style="padding:28px 24px 32px 0;border-bottom:1px solid #B8DFC0;display:flex;flex-direction:column;gap:14px">
+          <div class="whyicon" style="color:#1EB531">{{ b.icon }}</div>
           <div style="font-size:19px;font-weight:800;color:#0B1F5F">{{ b.title }}</div>
           <p style="margin:0;font-size:15px;line-height:1.55;color:#5B6480;text-wrap:pretty">{{ b.text }}</p>
         </div>
@@ -583,19 +596,20 @@
 
   <!-- search overlay -->
   <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;inset:0;z-index:100;background:#fff;animation:mgUp .25s ease both;overflow:auto">
-    <div style="max-width:1100px;margin:0 auto;padding:clamp(24px,6vh,64px) clamp(20px,5vw,72px)">
-      <div style="display:flex;justify-content:flex-end"><button onClick="{{ closeSearch }}" aria-label="Cerrar" style="width:44px;height:44px;border:0;background:transparent;cursor:pointer;color:#0F1633"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
-      <div style="display:flex;align-items:center;gap:16px;border-bottom:3px solid #0B1F5F;padding:12px 0">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0B1F5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-        <input ref="{{ searchRef }}" type="search" placeholder="¿Qué estás buscando?" aria-label="Buscar" style="flex:1;min-width:0;border:0;outline:none;font-size:clamp(24px,3vw,40px);font-weight:700;color:#0B1F5F;background:transparent;padding:8px 0" />
+  <div style="position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#071433 0%,#0B1F5F 55%,#1B49D6 100%);animation:mgUp .25s ease both;overflow:auto;color:#fff">
+    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 60% at 15% 20%,rgba(108,189,237,.35),transparent 60%),radial-gradient(55% 55% at 85% 10%,rgba(30,181,49,.28),transparent 55%),radial-gradient(50% 60% at 70% 85%,rgba(78,217,98,.22),transparent 60%)"></div>
+    <div style="position:relative;max-width:1100px;margin:0 auto;padding:clamp(24px,6vh,64px) clamp(20px,5vw,72px)">
+      <div style="display:flex;justify-content:flex-end"><button onClick="{{ closeSearch }}" aria-label="Cerrar" style="width:44px;height:44px;border:0;background:transparent;cursor:pointer;color:#fff"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
+      <div style="display:flex;align-items:center;gap:16px;border-bottom:3px solid rgba(255,255,255,.55);padding:12px 0">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+        <input ref="{{ searchRef }}" type="search" placeholder="¿Qué estás buscando?" aria-label="Buscar" style="flex:1;min-width:0;border:0;outline:none;font-size:clamp(24px,3vw,40px);font-weight:700;color:#fff;background:transparent;padding:8px 0;caret-color:#4ED962" />
       </div>
-      <div style="display:flex;gap:24px;margin-top:14px;font-size:13px;color:#5B6480;font-weight:600"><span>Productos</span><span>Marcas</span><span>Categorías</span></div>
+      <div style="display:flex;gap:24px;margin-top:14px;font-size:13px;color:rgba(255,255,255,.7);font-weight:600"><span>Productos</span><span>Marcas</span><span>Categorías</span></div>
       <div style="margin-top:48px">
-        <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#1EB531;margin-bottom:16px">BÚSQUEDAS POPULARES</div>
+        <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#4ED962;margin-bottom:16px">BÚSQUEDAS POPULARES</div>
         <div style="display:flex;flex-wrap:wrap;gap:10px">
           <sc-for list="{{ popular }}" as="term" hint-placeholder-count="4">
-            <button style="height:44px;padding:0 18px;border:1px solid #E3E7F0;background:#fff;font-size:15px;font-weight:600;color:#0F1633;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#1B49D6;background:#F3F5FA">{{ term }}</button>
+            <button style="height:44px;padding:0 18px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#4ED962;background:rgba(255,255,255,.16)">{{ term }}</button>
           </sc-for>
         </div>
       </div>
@@ -623,7 +637,7 @@
           <div style="font-size:16px;font-weight:800;color:#0B1F5F;margin-bottom:8px">{{ cat.name }}</div>
           <div style="display:flex;flex-wrap:wrap;gap:8px">
             <sc-for list="{{ cat.items }}" as="it" hint-placeholder-count="3">
-              <a href="#categorias" onClick="{{ closeMenu }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid #E3E7F0;font-size:14px;color:#0F1633">{{ it }}</a>
+              <a href="#catalogo" onClick="{{ it.go }}" style="display:inline-flex;align-items:center;min-height:44px;padding:0 14px;border:1px solid #E3E7F0;font-size:14px;color:#0F1633">{{ it.name }}</a>
             </sc-for>
           </div>
         </div>
@@ -776,6 +790,19 @@ class Component extends DCLogic {
       goAbout: go('about'), goAboutClose: go('about'),
       aboutLinkStyle: { color: view === 'about' ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: view === 'about' ? '2px solid #1B49D6' : '2px solid transparent' },
       goHome: go('home'), goCatalog: go('catalog'), goHomeClose: go('home'), goCatalogClose: go('catalog'),
+      goCat: ((self) => {
+        const mk = (name) => (e) => {
+          if (e && e.preventDefault) e.preventDefault();
+          const has = allCats.includes(name);
+          self.setState({ view: 'catalog', cats: has ? [name] : [], brands: [], onlyOffer: false, onlyStock: false, megaOpen: false, menuOpen: false });
+          window.scrollTo({ top: 0 });
+        };
+        return {
+          drones: mk('Drones'), vehiculos: mk('Vehículos RC'), audio: mk('Audio'),
+          bloques: mk('Bloques y armables'), herramientas: mk('Herramientas'),
+          fotovideo: mk('Foto y video'), juegos: mk('Juegos'), cuidado: mk('Cuidado personal')
+        };
+      })(this),
       goOffers: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ view: 'catalog', onlyOffer: true, megaOpen: false, menuOpen: false }); window.scrollTo({ top: 0 }); },
       offersLinkStyle: { color: isCatalog && onlyOffer ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: isCatalog && onlyOffer ? '2px solid #1B49D6' : '2px solid transparent' },
       catalogLinkStyle: { color: isCatalog ? '#1B49D6' : '#0F1633', padding: '26px 0', borderBottom: isCatalog ? '2px solid #1B49D6' : '2px solid transparent' },
@@ -861,12 +888,23 @@ class Component extends DCLogic {
       closeMenu: () => this.setState({ menuOpen: false }),
       preventSubmit: (e) => e.preventDefault(),
       searchRef: this.searchRef,
-      categories: [
-        { name: 'Juguetes', items: ['Drones', 'Vehículos RC', 'Bloques y armables', 'Juegos'] },
-        { name: 'Tecnología', items: ['Speakers', 'Auriculares', 'Smartwatch', 'Cámaras'] },
-        { name: 'Foto y video', items: ['Trípodes', 'Aros de luz', 'Cámaras infantiles'] },
-        { name: 'Herramientas y hogar', items: ['Herramientas', 'Hogar y mascotas', 'Cuidado personal'] }
-      ],
+      categories: (() => {
+        // Cada item lleva un handler propio: si su nombre matchea una categoría
+        // real del catálogo, filtra por ella; si no, va al catálogo entero.
+        const mkGo = (name) => (e) => {
+          if (e && e.preventDefault) e.preventDefault();
+          const catMatch = allCats.includes(name) ? [name] : [];
+          this.setState({ view: 'catalog', cats: catMatch, brands: [], onlyOffer: false, onlyStock: false, megaOpen: false, menuOpen: false });
+          window.scrollTo({ top: 0 });
+        };
+        const wrap = (arr) => arr.map((n) => ({ name: n, go: mkGo(n) }));
+        return [
+          { name: 'Juguetes', items: wrap(['Drones', 'Vehículos RC', 'Bloques y armables', 'Juegos']) },
+          { name: 'Tecnología', items: wrap(['Audio', 'Tecnología']) },
+          { name: 'Foto y video', items: wrap(['Foto y video']) },
+          { name: 'Herramientas y hogar', items: wrap(['Herramientas', 'Hogar y mascotas', 'Cuidado personal']) }
+        ];
+      })(),
       popular: ['Drones', 'Bloques para armar', 'Control remoto', 'Speakers'],
       aboutRef: this.aboutRef,
       aboutCards: [

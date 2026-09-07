@@ -105,6 +105,50 @@
     .catimg{max-width:78%!important;max-height:78%!important;width:auto!important;height:auto!important;object-fit:contain;mix-blend-mode:multiply;transition:transform .35s ease}
     .cattile:hover .catimg{transform:scale(1.06)}
 
+    /* Shimmer para títulos de sección — sweep de color por el texto.
+       Dos variantes: sobre ground claro (navy con destello verde) y
+       sobre ground oscuro (blanco con destello celeste). */
+    .shimmer-title{
+      background:linear-gradient(110deg,
+        #0B1F5F 0%,
+        #0B1F5F 42%,
+        #4ED962 50%,
+        #0B1F5F 58%,
+        #0B1F5F 100%);
+      background-size:220% 100%;
+      background-position:220% 0;
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:transparent;
+      animation:shimmerSweep 4.5s ease-in-out infinite;
+      text-shadow:none;
+      display:inline-block;
+    }
+    .shimmer-title-light{
+      background:linear-gradient(110deg,
+        #ffffff 0%,
+        #ffffff 42%,
+        #6CBDED 50%,
+        #ffffff 58%,
+        #ffffff 100%);
+      background-size:220% 100%;
+      background-position:220% 0;
+      -webkit-background-clip:text;
+      background-clip:text;
+      -webkit-text-fill-color:transparent;
+      color:transparent;
+      animation:shimmerSweep 4.5s ease-in-out infinite;
+      display:inline-block;
+    }
+    @keyframes shimmerSweep{
+      0%,100%{background-position:220% 0}
+      55%{background-position:-120% 0}
+    }
+    @media (prefers-reduced-motion:reduce){
+      .shimmer-title,.shimmer-title-light{animation:none}
+    }
+
     /* Por qué MG — cards con hover glow y animación de entrada */
     .whycard{position:relative;transition:transform .3s ease}
     .whycard::after{content:'';position:absolute;left:0;bottom:-1px;height:2px;width:0;background:#1EB531;transition:width .5s cubic-bezier(.22,1,.36,1)}
@@ -407,7 +451,7 @@
   <!-- categories -->
   <section id="categorias" style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight mpad">
     <div data-m="sechead" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:40px">
-      <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F;max-width:22ch;text-wrap:pretty">Todo empieza por una categoría.</h2>
+      <h2 class="shimmer-title" style="margin:0;font-size:clamp(36px,3.6vw,56px);font-weight:800;letter-spacing:-.025em;line-height:1.02;max-width:22ch;text-wrap:pretty">Todo empieza por una categoría.</h2>
       <p style="margin:0;color:#5B6480;font-size:16px;max-width:52ch;text-wrap:pretty">Universos de producto pensados para llegar rápido a lo que necesitás.</p>
     </div>
     <div data-m="grid2" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
@@ -428,7 +472,7 @@
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Bloques y armables</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Sets para armar</div></div>
       </a>
       <a href="#catalogo" onClick="{{ goCat.herramientas }}" style="display:flex;flex-direction:column;overflow:hidden;background:#0B1F5F;color:#fff;transition:background .2s,transform .2s" style-hover="background:#1B49D6;transform:translateY(-2px)">
-        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/30.webp" alt="Herramientas" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/30.webp" alt="Herramientas" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px"><div style="font-size:18px;font-weight:800">Herramientas</div><div style="font-size:13px;opacity:.75;margin-top:2px">Cuidado y hogar</div></div>
       </a>
       <a href="#catalogo" onClick="{{ goCat.fotovideo }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
@@ -436,7 +480,7 @@
         <div data-m="cardm" style="padding:14px 18px 16px;border-top:1px solid #E3E7F0"><div style="font-size:18px;font-weight:800;color:#0B1F5F">Foto y video</div><div style="font-size:13px;color:#5B6480;margin-top:2px">Trípodes, aros de luz</div></div>
       </a>
       <a href="#catalogo" onClick="{{ goCat.juegos }}" style="display:flex;flex-direction:column;overflow:hidden;background:#1EB531;color:#fff;transition:background .2s,transform .2s" style-hover="background:#17A62B;transform:translateY(-2px)">
-        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#fff;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/41.webp" alt="Juegos" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
+        <div data-m="imgtile" class="cattile" style="aspect-ratio:4/3;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:22px"><img class="catimg" src="img/41.webp" alt="Juegos" loading="lazy" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></div>
         <div data-m="cardm" style="padding:14px 18px 16px"><div style="font-size:18px;font-weight:800">Juegos</div><div style="font-size:13px;opacity:.85;margin-top:2px">Para toda la familia</div></div>
       </a>
       <a href="#catalogo" onClick="{{ goCat.cuidado }}" style="display:flex;flex-direction:column;overflow:hidden;border:1px solid #E3E7F0;background:#fff;transition:border-color .2s,transform .2s" style-hover="border-color:#1B49D6;transform:translateY(-2px)">
@@ -450,7 +494,7 @@
   <section style="background:#0B1F5F;color:#fff;overflow:hidden;position:relative">
     <div style="max-width:1440px;margin:0 auto;padding:80px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight mpad">
       <div style="grid-column:span 5;display:flex;flex-direction:column;gap:24px">
-        <h2 data-m="h1" style="margin:0;font-size:clamp(34px,3.6vw,54px);font-weight:800;letter-spacing:-.025em;line-height:1.02;text-wrap:pretty">Algo bueno siempre está por llegar.</h2>
+        <h2 class="shimmer-title-light" data-m="h1" style="margin:0;font-size:clamp(38px,4.2vw,60px);font-weight:800;letter-spacing:-.025em;line-height:1.02;text-wrap:pretty">Algo bueno siempre está por llegar.</h2>
         <p style="margin:0;font-size:17px;line-height:1.6;color:rgba(255,255,255,.78);max-width:42ch;text-wrap:pretty">Nuevas categorías, nuevos productos y oportunidades para encontrar justo lo que necesitás.</p>
         <a href="#categorias" class="beam-btn beam-dark" style="display:inline-flex;align-self:flex-start;align-items:center;height:52px;padding:0 26px;background:#1EB531;color:#fff;font-weight:700;font-size:15px;--beam-c1:#6CBDED;--beam-c2:#4ED962;--beam-thickness:2px;transition:background .2s" style-hover="background:#17A62B"><span>Descubrir MG</span></a>
       </div>
@@ -466,7 +510,7 @@
   <section id="marcas" style="background:#fff">
     <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight mpad">
       <div data-m="sechead" style="display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:36px">
-        <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Nuestras marcas</h2>
+        <h2 class="shimmer-title" style="margin:0;font-size:clamp(36px,3.6vw,56px);font-weight:800;letter-spacing:-.025em;line-height:1.02">Nuestras marcas</h2>
         <p style="margin:0;color:#5B6480;font-size:16px;max-width:52ch;text-wrap:pretty">Trabajamos con marcas que ya conocés y en las que confiás.</p>
       </div>
       <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px" data-m="brands4">
@@ -490,7 +534,7 @@
   <!-- why MG -->
   <section style="background:#E8F7EA;border-top:2px solid #0B1F5F">
   <div style="max-width:1440px;margin:0 auto;padding:96px clamp(20px,5vw,72px)" data-m="tight mpad">
-    <h2 style="margin:0 0 40px;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Por qué MG</h2>
+    <h2 class="shimmer-title" style="margin:0 0 40px;font-size:clamp(36px,3.6vw,56px);font-weight:800;letter-spacing:-.025em;line-height:1.02">Por qué MG</h2>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));border-top:2px solid #0B1F5F" data-m="grid2">
       <sc-for list="{{ benefits }}" as="b" hint-placeholder-count="4">
         <div class="whycard" style="padding:28px 24px 32px 0;border-bottom:1px solid #B8DFC0;display:flex;flex-direction:column;gap:14px">
@@ -523,7 +567,7 @@
   <section id="newsletter" style="border-top:2px solid #0B1F5F;background:#0B1F5F;color:#fff">
     <div style="max-width:1440px;margin:0 auto;padding:72px clamp(20px,5vw,72px);display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight mpad">
       <div style="grid-column:span 5">
-        <h2 style="margin:0 0 10px;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;color:#fff">Enterate primero.</h2>
+        <h2 class="shimmer-title-light" style="margin:0 0 10px;font-size:clamp(36px,3.8vw,54px);font-weight:800;letter-spacing:-.025em">Enterate primero.</h2>
         <p style="margin:0;color:rgba(255,255,255,.75);font-size:16px;line-height:1.6;text-wrap:pretty">Novedades, lanzamientos y oportunidades de MG directamente para vos.</p>
       </div>
       <form onSubmit="{{ preventSubmit }}" data-m="col nlform" style="grid-column:7 / span 6;display:flex;gap:0;border:2px solid #fff;background:#fff">

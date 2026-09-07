@@ -70,6 +70,15 @@
       [data-mheader-actions] button,[data-mheader-actions] a{width:40px!important;height:40px!important;padding:0!important}
       [data-mheader-actions] [data-mheader-search]{border:0!important;background:transparent!important}
       [data-mheader-actions] [data-mheader-search] span{display:none!important}
+      /* Marcas: 4 por fila en mobile, tarjetas mini */
+      [data-m~="brands4"]{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:6px!important;overflow:visible!important}
+      [data-m~="brands4"]>*{grid-column:auto!important;grid-row:auto!important;min-height:0!important;min-width:0!important;flex:none!important}
+      [data-m~="brands4"] img{max-height:44px!important}
+      [data-m~="brands4"] .brandpanel{padding:8px!important;aspect-ratio:1/1!important}
+      [data-m~="brands4"] .brandmeta{padding:6px 6px 8px!important;gap:2px!important}
+      [data-m~="brands4"] .brandname{font-size:11px!important;line-height:1.15!important;font-weight:800!important}
+      [data-m~="brands4"] .brandcount{font-size:9px!important;letter-spacing:0!important}
+      [data-m~="brands4"] .brandcount span{display:none!important}
     }
     [data-range] input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;position:absolute;left:0;top:8px;width:100%;height:28px;margin:0}
     [data-range] input[type=range]::-webkit-slider-runnable-track{background:transparent}
@@ -437,19 +446,19 @@
         <h2 style="margin:0;font-size:clamp(30px,3vw,44px);font-weight:800;letter-spacing:-.02em;line-height:1.05;color:#0B1F5F">Nuestras marcas</h2>
         <p style="margin:0;color:#5B6480;font-size:16px;max-width:40ch;text-wrap:pretty">Trabajamos con marcas que ya conocés y en las que confiás.</p>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px" data-m="grid2">
+      <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px" data-m="brands4">
         <sc-for list="{{ brandTiles }}" as="b" hint-placeholder-count="7">
           <a href="#catalogo" onClick="{{ b.go }}" style="overflow:hidden;display:flex;flex-direction:column;background:#fff;border:1px solid #E3E7F0;color:#0B1F5F;transition:border-color .25s,transform .25s,box-shadow .25s" style-hover="border-color:#0B1F5F;transform:translateY(-3px);box-shadow:0 18px 34px -22px rgba(11,31,95,.45)">
-            <div style="{{ b.panelStyle }}"><img src="{{ b.img }}" alt="{{ b.name }}" loading="lazy" style="{{ b.imgStyle }}" /></div>
-            <div style="padding:16px 18px 18px;border-top:1px solid #E3E7F0;display:flex;flex-direction:column;gap:10px">
-              <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ b.name }}</div>
-              <div style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#5B6480">{{ b.meta }}<span aria-hidden="true" style="color:#1B49D6">→</span></div>
+            <div class="brandpanel" style="{{ b.panelStyle }}"><img src="{{ b.img }}" alt="{{ b.name }}" loading="lazy" style="{{ b.imgStyle }}" /></div>
+            <div class="brandmeta" style="padding:16px 18px 18px;border-top:1px solid #E3E7F0;display:flex;flex-direction:column;gap:10px">
+              <div class="brandname" style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1">{{ b.name }}</div>
+              <div class="brandcount" style="display:flex;align-items:center;justify-content:space-between;font-size:12px;font-weight:700;color:#5B6480">{{ b.meta }}<span aria-hidden="true" style="color:#1B49D6">→</span></div>
             </div>
           </a>
         </sc-for>
-        <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inBrands }}" onMouseLeave="{{ outTile }}" style="background:#0B1F5F;color:#fff;padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:background .25s" style-hover="background:#1B49D6">
-          <div style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;text-wrap:pretty">Ver todo el catálogo</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700">62 productos <span aria-hidden="true" style="{{ arrowBrands }}">→</span></div>
+        <a href="#catalogo" onClick="{{ goCatalog }}" onMouseEnter="{{ inBrands }}" onMouseLeave="{{ outTile }}" class="brandmeta" style="background:#0B1F5F;color:#fff;padding:22px;display:flex;flex-direction:column;justify-content:space-between;gap:20px;transition:background .25s" style-hover="background:#1B49D6">
+          <div class="brandname" style="font-size:22px;font-weight:800;letter-spacing:-.02em;line-height:1.1;text-wrap:pretty">Ver todo el catálogo</div>
+          <div class="brandcount" style="display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700">62 productos <span aria-hidden="true" style="{{ arrowBrands }}">→</span></div>
         </a>
       </div>
     </div>

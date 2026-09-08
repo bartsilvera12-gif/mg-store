@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MG Store · Admin</title>
+<link rel="icon" type="image/png" href="/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--navy:#0B1F5F;--navy-2:#071433;--blue:#1B49D6;--green:#1EB531;--red:#EC3013;--muted:#5B6480;--soft:#F3F5FA;--line:#E3E7F0}
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:Manrope,system-ui,sans-serif;background:#F8F9FC;color:#0F1633;-webkit-font-smoothing:antialiased}
+  h1,h2,h3{margin:0;letter-spacing:-.02em;color:var(--navy)}
+  button{font-family:inherit}
+  input,select,textarea{font-family:inherit;font-size:14px;padding:8px 12px;border:1.5px solid var(--line);background:#fff;color:#0F1633;outline:0;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 18px;border:2px solid var(--navy);background:#fff;color:var(--navy);font-weight:700;font-size:14px;cursor:pointer;transition:background .15s,color .15s}
+  .btn:hover{background:var(--navy);color:#fff}
+  .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+  .btn.primary:hover{background:#17A62B;border-color:#17A62B}
+  .btn.ghost{border-color:var(--line);color:var(--muted)}
+  .btn.ghost:hover{background:var(--soft);color:var(--navy)}
+  .btn.danger{border-color:var(--red);color:var(--red);background:#fff}
+  .btn.danger:hover{background:var(--red);color:#fff}
+  .btn.sm{height:32px;padding:0 12px;font-size:12px}
+  .card{background:#fff;border:1px solid var(--line);padding:20px}
+  header.topbar{background:var(--navy);color:#fff;padding:14px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+  header.topbar h1{color:#fff;font-size:20px}
+  nav.tabs{display:flex;gap:0;background:#fff;border-bottom:2px solid var(--navy);padding:0 20px;overflow-x:auto}
+  nav.tabs button{border:0;background:transparent;padding:14px 18px;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:color .15s,border-color .15s}
+  nav.tabs button.on{color:var(--navy);border-bottom-color:var(--green)}
+  main{padding:24px 20px;max-width:1440px;margin:0 auto}
+  .row{display:grid;gap:12px}
+  .grid-tools{display:grid;grid-template-columns:1fr auto auto;gap:10px;margin-bottom:16px;align-items:center}
+  table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);font-size:14px}
+  th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--line);vertical-align:middle}
+  th{background:var(--soft);font-weight:800;color:var(--navy);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+  tr:hover td{background:#FAFBFE}
+  td img{width:44px;height:44px;object-fit:contain;background:var(--soft);mix-blend-mode:multiply}
+  .pill{display:inline-flex;align-items:center;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+  .pill.ok{background:#E8F7EA;color:#0E7A22}
+  .pill.off{background:#F3F5FA;color:var(--muted)}
+  .pill.warn{background:#FEF0EB;color:var(--red)}
+  form.stack{display:grid;gap:14px;max-width:640px}
+  form.stack label{display:grid;gap:5px;font-size:12px;font-weight:800;color:var(--navy);letter-spacing:.05em;text-transform:uppercase}
+  form.stack .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  form.stack .actions{display:flex;gap:10px;margin-top:6px}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--navy);color:#fff;padding:14px 20px;font-weight:700;font-size:14px;box-shadow:0 20px 40px -20px rgba(11,31,95,.5);animation:up .3s ease}
+  .toast.err{background:var(--red)}
+  @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .login-wrap{min-height:100vh;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,var(--navy-2),var(--navy) 60%,var(--blue))}
+  .login-card{background:#fff;padding:36px 32px;width:min(400px,100%);border:1px solid var(--line)}
+  .login-card h1{font-size:22px;margin-bottom:6px}
+  .login-card p{color:var(--muted);font-size:13px;margin:0 0 20px}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);font-size:14px}
+  @media (max-width:640px){
+    main{padding:16px 12px}
+    .grid-tools{grid-template-columns:1fr}
+    th,td{padding:8px}
+    td .brand-col,td .cat-col{display:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- CONFIG: cambia por tus valores reales -->
+<script>
+  window.MG_ADMIN_CONFIG = {
+    // Cambiá estas dos por lo tuyo antes de abrir el archivo.
+    supabaseUrl: 'https://TU-SUPABASE-URL.supabase.co',
+    supabaseAnonKey: 'TU_ANON_KEY_PUBLICA'
+  };
+</script>
+
+<div id="app"></div>
+
+<script>
+const cfg = window.MG_ADMIN_CONFIG;
+const supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+  auth: { persistSession: true, autoRefreshToken: true }
+});
+
+const app = document.getElementById('app');
+const state = { user: null, tab: 'products', data: { products: [], categories: [], brands: [], orders: [] }, editing: null, q: '' };
+
+const gs = (n) => 'Gs. ' + Number(n||0).toLocaleString('es-PY');
+
+function toast(msg, err) {
+  const t = document.createElement('div');
+  t.className = 'toast' + (err ? ' err' : '');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3400);
+}
+
+async function loadAll() {
+  const [p, c, b, o] = await Promise.all([
+    supabase.from('products').select('*, brand:brands(name,slug), category:categories(name,slug)').order('sort_order').order('name'),
+    supabase.from('categories').select('*').order('sort_order').order('name'),
+    supabase.from('brands').select('*').order('sort_order').order('name'),
+    supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(80)
+  ]);
+  if (p.error) { toast(p.error.message, true); return; }
+  state.data.products = p.data || [];
+  state.data.categories = c.data || [];
+  state.data.brands = b.data || [];
+  state.data.orders = o.data || [];
+  render();
+}
+
+// -------------------- render ----------------------
+
+function render() {
+  if (!state.user) { renderLogin(); return; }
+  app.innerHTML = `
+    <header class="topbar">
+      <h1>MG Store · Admin</h1>
+      <div style="display:flex;gap:12px;align-items:center;font-size:13px">
+        <span style="opacity:.75">${state.user.email}</span>
+        <button class="btn ghost sm" data-a="logout">Salir</button>
+      </div>
+    </header>
+    <nav class="tabs">
+      <button data-tab="products"   class="${state.tab==='products'?'on':''}">Productos</button>
+      <button data-tab="categories" class="${state.tab==='categories'?'on':''}">Categorías</button>
+      <button data-tab="brands"     class="${state.tab==='brands'?'on':''}">Marcas</button>
+      <button data-tab="orders"     class="${state.tab==='orders'?'on':''}">Pedidos</button>
+    </nav>
+    <main>${panel()}</main>`;
+  document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { state.tab = b.dataset.tab; state.editing = null; render(); });
+  document.querySelector('[data-a="logout"]').onclick = async () => { await supabase.auth.signOut(); state.user = null; render(); };
+  wireCurrentPanel();
+}
+
+function panel() {
+  if (state.editing) return renderEditor(state.editing);
+  if (state.tab === 'products')   return renderProducts();
+  if (state.tab === 'categories') return renderList('categories', ['name','slug','sort_order','active']);
+  if (state.tab === 'brands')     return renderList('brands', ['name','slug','sort_order','active','on_dark_bg']);
+  if (state.tab === 'orders')     return renderOrders();
+  return '';
+}
+
+// -------------------- products --------------------
+
+function renderProducts() {
+  const q = state.q.trim().toLowerCase();
+  const rows = state.data.products.filter(p =>
+    !q || p.name.toLowerCase().includes(q) || (p.brand?.name||'').toLowerCase().includes(q) || (p.category?.name||'').toLowerCase().includes(q)
+  );
+  return `
+    <div class="grid-tools">
+      <input placeholder="Buscar por nombre, marca o categoría" value="${state.q.replace(/"/g,'&quot;')}" data-q>
+      <button class="btn primary" data-a="new-product">+ Nuevo producto</button>
+      <button class="btn ghost" data-a="reload">Refrescar</button>
+    </div>
+    ${rows.length === 0 ? `<div class="empty">Sin resultados.</div>` : `
+    <table>
+      <thead><tr>
+        <th></th><th>Nombre</th><th class="brand-col">Marca</th><th class="cat-col">Categoría</th>
+        <th style="text-align:right">Precio</th><th>Stock</th><th>Estado</th><th></th>
+      </tr></thead>
+      <tbody>
+        ${rows.map(p => `
+          <tr>
+            <td>${p.image_url ? `<img src="${p.image_url}" alt="">` : ''}</td>
+            <td><div style="font-weight:700">${p.name}</div><div style="font-size:11px;color:var(--muted)">${p.slug}</div></td>
+            <td class="brand-col">${p.brand?.name || '—'}</td>
+            <td class="cat-col">${p.category?.name || '—'}</td>
+            <td style="text-align:right;font-weight:800;color:var(--navy)">${gs(p.price_gs)}</td>
+            <td>${p.stock}</td>
+            <td>${p.active ? '<span class="pill ok">Activo</span>' : '<span class="pill off">Oculto</span>'}${p.featured ? ' <span class="pill ok" style="background:#EEF2FD;color:var(--blue)">★</span>' : ''}</td>
+            <td style="text-align:right;white-space:nowrap">
+              <button class="btn sm" data-edit="${p.id}">Editar</button>
+              <button class="btn sm danger" data-del="${p.id}">Borrar</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>`}
+  `;
+}
+
+// -------------------- generic list (categories, brands) --------------------
+
+function renderList(table, cols) {
+  const rows = state.data[table];
+  return `
+    <div class="grid-tools">
+      <div style="font-weight:800;font-size:14px;color:var(--navy)">${rows.length} ${table}</div>
+      <button class="btn primary" data-a="new-${table}">+ Nuevo</button>
+      <button class="btn ghost" data-a="reload">Refrescar</button>
+    </div>
+    <table>
+      <thead><tr>${cols.map(c => `<th>${c}</th>`).join('')}<th></th></tr></thead>
+      <tbody>
+        ${rows.map(r => `
+          <tr>
+            ${cols.map(c => `<td>${typeof r[c] === 'boolean' ? (r[c] ? '<span class="pill ok">sí</span>' : '<span class="pill off">no</span>') : (r[c] ?? '—')}</td>`).join('')}
+            <td style="text-align:right;white-space:nowrap">
+              <button class="btn sm" data-edit-${table}="${r.id}">Editar</button>
+              <button class="btn sm danger" data-del-${table}="${r.id}">Borrar</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// -------------------- orders --------------------
+
+function renderOrders() {
+  const rows = state.data.orders;
+  if (rows.length === 0) return `<div class="empty">Todavía no hay pedidos registrados.</div>`;
+  return `
+    <div class="grid-tools"><div style="font-weight:800;font-size:14px;color:var(--navy)">${rows.length} pedidos</div><span></span><button class="btn ghost" data-a="reload">Refrescar</button></div>
+    <table>
+      <thead><tr><th>#</th><th>Cliente</th><th>Origen</th><th>Items</th><th style="text-align:right">Total</th><th>Estado</th><th>Fecha</th><th></th></tr></thead>
+      <tbody>
+        ${rows.map(o => `
+          <tr>
+            <td>#${o.order_number}</td>
+            <td>${o.customer_name || '—'}<br><span style="font-size:11px;color:var(--muted)">${o.customer_phone || o.customer_email || ''}</span></td>
+            <td>${o.source}</td>
+            <td>${(o.order_items||[]).length}</td>
+            <td style="text-align:right;font-weight:800;color:var(--navy)">${gs(o.total_gs)}</td>
+            <td>
+              <select data-order-status="${o.id}">
+                ${['pending','contacted','paid','delivered','cancelled'].map(s => `<option ${o.status===s?'selected':''} value="${s}">${s}</option>`).join('')}
+              </select>
+            </td>
+            <td>${new Date(o.created_at).toLocaleDateString('es-PY')}</td>
+            <td><button class="btn sm ghost" data-order-details="${o.id}">Ver</button></td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+// -------------------- editors --------------------
+
+function renderEditor(ctx) {
+  const { table, id } = ctx;
+  const row = id ? state.data[table].find(x => x.id === id) : {};
+  if (table === 'products') return productEditor(row);
+  if (table === 'categories') return categoryEditor(row);
+  if (table === 'brands') return brandEditor(row);
+  return '';
+}
+
+function productEditor(p) {
+  const cats = state.data.categories;
+  const brs = state.data.brands;
+  return `
+    <div style="margin-bottom:14px"><button class="btn ghost sm" data-a="cancel">← Volver</button></div>
+    <div class="card">
+      <h2 style="font-size:22px;margin-bottom:16px">${p.id ? 'Editar producto' : 'Nuevo producto'}</h2>
+      <form class="stack" data-form="products">
+        <input type="hidden" name="id" value="${p.id || ''}">
+        <label>Nombre <input required name="name" value="${(p.name||'').replace(/"/g,'&quot;')}"></label>
+        <label>Slug (URL) <input required name="slug" value="${(p.slug||'').replace(/"/g,'&quot;')}" pattern="[a-z0-9-]+" placeholder="mi-producto"></label>
+        <label>Descripción <textarea name="description" rows="3" placeholder="Opcional">${p.description || ''}</textarea></label>
+        <div class="two">
+          <label>Marca <select name="brand_id">
+            <option value="">— Sin marca —</option>
+            ${brs.map(b => `<option ${b.id===p.brand_id?'selected':''} value="${b.id}">${b.name}</option>`).join('')}
+          </select></label>
+          <label>Categoría <select name="category_id" required>
+            <option value="">— Elegí una —</option>
+            ${cats.map(c => `<option ${c.id===p.category_id?'selected':''} value="${c.id}">${c.name}</option>`).join('')}
+          </select></label>
+        </div>
+        <div class="two">
+          <label>Precio (Gs.) <input required type="number" min="0" step="1000" name="price_gs" value="${p.price_gs||''}"></label>
+          <label>Precio mayorista (Gs.) <input type="number" min="0" step="1000" name="wholesale_price_gs" value="${p.wholesale_price_gs||''}"></label>
+        </div>
+        <div class="two">
+          <label>Stock <input required type="number" min="0" name="stock" value="${p.stock??0}"></label>
+          <label>Orden <input type="number" name="sort_order" value="${p.sort_order??0}"></label>
+        </div>
+        <label>Imagen (URL o subir archivo)
+          <input type="text" name="image_url" value="${(p.image_url||'').replace(/"/g,'&quot;')}" placeholder="img/07.webp o URL completa">
+          <input type="file" accept="image/*" data-upload>
+        </label>
+        <div class="two">
+          <label style="flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:600;font-size:14px;color:#0F1633"><input type="checkbox" name="active" ${p.active!==false?'checked':''}> Activo (visible en la tienda)</label>
+          <label style="flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:600;font-size:14px;color:#0F1633"><input type="checkbox" name="featured" ${p.featured?'checked':''}> Destacado</label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn primary">${p.id ? 'Guardar cambios' : 'Crear producto'}</button>
+          <button type="button" class="btn ghost" data-a="cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+function categoryEditor(c) {
+  return `
+    <div style="margin-bottom:14px"><button class="btn ghost sm" data-a="cancel">← Volver</button></div>
+    <div class="card">
+      <h2 style="font-size:22px;margin-bottom:16px">${c.id ? 'Editar categoría' : 'Nueva categoría'}</h2>
+      <form class="stack" data-form="categories">
+        <input type="hidden" name="id" value="${c.id || ''}">
+        <label>Nombre <input required name="name" value="${(c.name||'').replace(/"/g,'&quot;')}"></label>
+        <label>Slug <input required name="slug" pattern="[a-z0-9-]+" value="${(c.slug||'').replace(/"/g,'&quot;')}"></label>
+        <label>Descripción <textarea name="description" rows="2">${c.description||''}</textarea></label>
+        <div class="two">
+          <label>Orden <input type="number" name="sort_order" value="${c.sort_order??0}"></label>
+          <label style="flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:600;font-size:14px;color:#0F1633"><input type="checkbox" name="active" ${c.active!==false?'checked':''}> Activa</label>
+        </div>
+        <div class="actions">
+          <button type="submit" class="btn primary">${c.id ? 'Guardar' : 'Crear'}</button>
+          <button type="button" class="btn ghost" data-a="cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+function brandEditor(b) {
+  return `
+    <div style="margin-bottom:14px"><button class="btn ghost sm" data-a="cancel">← Volver</button></div>
+    <div class="card">
+      <h2 style="font-size:22px;margin-bottom:16px">${b.id ? 'Editar marca' : 'Nueva marca'}</h2>
+      <form class="stack" data-form="brands">
+        <input type="hidden" name="id" value="${b.id || ''}">
+        <label>Nombre <input required name="name" value="${(b.name||'').replace(/"/g,'&quot;')}"></label>
+        <label>Slug <input required name="slug" pattern="[a-z0-9-]+" value="${(b.slug||'').replace(/"/g,'&quot;')}"></label>
+        <label>Logo (URL o subir archivo)
+          <input type="text" name="logo_url" value="${(b.logo_url||'').replace(/"/g,'&quot;')}" placeholder="URL o /logos/marca.png">
+          <input type="file" accept="image/*" data-upload data-target="logo_url">
+        </label>
+        <div class="two">
+          <label>Orden <input type="number" name="sort_order" value="${b.sort_order??0}"></label>
+          <label style="flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:600;font-size:14px;color:#0F1633"><input type="checkbox" name="on_dark_bg" ${b.on_dark_bg?'checked':''}> Logo requiere fondo oscuro</label>
+        </div>
+        <label style="flex-direction:row;align-items:center;gap:8px;text-transform:none;letter-spacing:0;font-weight:600;font-size:14px;color:#0F1633"><input type="checkbox" name="active" ${b.active!==false?'checked':''}> Activa</label>
+        <div class="actions">
+          <button type="submit" class="btn primary">${b.id ? 'Guardar' : 'Crear'}</button>
+          <button type="button" class="btn ghost" data-a="cancel">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  `;
+}
+
+// -------------------- wiring --------------------
+
+function wireCurrentPanel() {
+  // Buscar
+  const qi = document.querySelector('input[data-q]');
+  if (qi) qi.oninput = (e) => { state.q = e.target.value; renderInline(); };
+  document.querySelectorAll('[data-a="reload"]').forEach(b => b.onclick = loadAll);
+  document.querySelectorAll('[data-a="cancel"]').forEach(b => b.onclick = () => { state.editing = null; render(); });
+  document.querySelectorAll('[data-a="new-product"]').forEach(b => b.onclick = () => { state.editing = { table: 'products' }; render(); });
+  document.querySelectorAll('[data-a="new-categories"]').forEach(b => b.onclick = () => { state.editing = { table: 'categories' }; render(); });
+  document.querySelectorAll('[data-a="new-brands"]').forEach(b => b.onclick = () => { state.editing = { table: 'brands' }; render(); });
+
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => { state.editing = { table: 'products', id: b.dataset.edit }; render(); });
+  document.querySelectorAll('[data-edit-categories]').forEach(b => b.onclick = () => { state.editing = { table: 'categories', id: b.dataset.editCategories }; render(); });
+  document.querySelectorAll('[data-edit-brands]').forEach(b => b.onclick = () => { state.editing = { table: 'brands', id: b.dataset.editBrands }; render(); });
+
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => del('products', b.dataset.del));
+  document.querySelectorAll('[data-del-categories]').forEach(b => b.onclick = () => del('categories', b.dataset.delCategories));
+  document.querySelectorAll('[data-del-brands]').forEach(b => b.onclick = () => del('brands', b.dataset.delBrands));
+
+  document.querySelectorAll('[data-order-status]').forEach(sel => sel.onchange = async (e) => {
+    const { error } = await supabase.from('orders').update({ status: e.target.value }).eq('id', sel.dataset.orderStatus);
+    if (error) toast(error.message, true); else toast('Estado actualizado');
+  });
+  document.querySelectorAll('[data-order-details]').forEach(b => b.onclick = () => showOrder(b.dataset.orderDetails));
+
+  document.querySelectorAll('form[data-form]').forEach(f => f.onsubmit = save);
+  document.querySelectorAll('[data-upload]').forEach(inp => inp.onchange = (e) => upload(e.target));
+}
+
+function renderInline() {
+  // sólo re-render cuerpo, para no perder el foco del input al escribir
+  document.querySelector('main').innerHTML = panel();
+  wireCurrentPanel();
+  const q = document.querySelector('input[data-q]');
+  if (q) { q.focus(); q.setSelectionRange(q.value.length, q.value.length); }
+}
+
+async function del(table, id) {
+  const row = state.data[table].find(x => x.id === id);
+  if (!confirm(`¿Borrar "${row?.name || 'esto'}"? No se puede deshacer.`)) return;
+  const { error } = await supabase.from(table).delete().eq('id', id);
+  if (error) { toast(error.message, true); return; }
+  toast('Borrado');
+  loadAll();
+}
+
+async function save(e) {
+  e.preventDefault();
+  const form = e.target;
+  const table = form.dataset.form;
+  const fd = new FormData(form);
+  const row = {};
+  for (const [k, v] of fd.entries()) {
+    if (k === 'id') { if (v) row.id = v; continue; }
+    if (['active','featured','on_dark_bg'].includes(k)) { row[k] = true; continue; }
+    if (['price_gs','wholesale_price_gs','stock','sort_order'].includes(k)) { row[k] = v === '' ? null : Number(v); continue; }
+    if (k === 'brand_id' || k === 'category_id') { row[k] = v || null; continue; }
+    row[k] = v.trim() || null;
+  }
+  // los checkboxes no aparecen en FormData cuando están unchecked
+  ['active','featured','on_dark_bg'].forEach(k => { if (!fd.has(k) && form.querySelector(`[name="${k}"]`)) row[k] = false; });
+  const q = row.id
+    ? supabase.from(table).update(row).eq('id', row.id)
+    : supabase.from(table).insert(row);
+  const { error } = await q;
+  if (error) { toast(error.message, true); return; }
+  toast(row.id ? 'Cambios guardados' : 'Creado');
+  state.editing = null;
+  await loadAll();
+}
+
+async function upload(fileInput) {
+  const file = fileInput.files[0];
+  if (!file) return;
+  const path = 'products/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+  toast('Subiendo...');
+  const { error } = await supabase.storage.from('mg-media').upload(path, file, { upsert: false, contentType: file.type });
+  if (error) { toast(error.message, true); return; }
+  const { data } = supabase.storage.from('mg-media').getPublicUrl(path);
+  const target = fileInput.dataset.target || 'image_url';
+  const t = fileInput.form.querySelector(`[name="${target}"]`);
+  if (t) t.value = data.publicUrl;
+  toast('Imagen subida');
+}
+
+async function showOrder(id) {
+  const o = state.data.orders.find(x => x.id === id);
+  if (!o) return;
+  const items = (o.order_items || []).map(i => `${i.quantity}× ${i.product_name} — ${gs(i.subtotal_gs)}`).join('\n');
+  alert(`Pedido #${o.order_number}\n\nCliente: ${o.customer_name || '—'}\nTeléfono: ${o.customer_phone || '—'}\nEmail: ${o.customer_email || '—'}\n\nItems:\n${items || '—'}\n\nTotal: ${gs(o.total_gs)}\n\nNotas: ${o.notes || '—'}`);
+}
+
+// -------------------- login --------------------
+
+function renderLogin() {
+  app.innerHTML = `
+    <div class="login-wrap"><div class="login-card">
+      <h1>MG Store · Admin</h1>
+      <p>Ingresá con tu cuenta de administrador.</p>
+      <form class="stack" id="login-form">
+        <label>Email <input required type="email" name="email" autocomplete="email"></label>
+        <label>Contraseña <input required type="password" name="password" autocomplete="current-password"></label>
+        <div class="actions"><button class="btn primary" type="submit" style="width:100%;height:48px">Entrar</button></div>
+      </form>
+    </div></div>
+  `;
+  document.getElementById('login-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const fd = new FormData(e.target);
+    const { data, error } = await supabase.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('password') });
+    if (error) { toast(error.message, true); return; }
+    state.user = data.user;
+    await loadAll();
+  };
+}
+
+// -------------------- boot ------------------------
+
+(async () => {
+  if (!cfg.supabaseUrl.includes('supabase') || cfg.supabaseAnonKey.startsWith('TU_')) {
+    app.innerHTML = `<div style="padding:40px;max-width:640px;margin:40px auto;background:#fff;border:2px solid var(--red)">
+      <h2 style="color:var(--red)">Configurá Supabase</h2>
+      <p>Editá <code>admin.html</code> arriba de todo y reemplazá <code>supabaseUrl</code> y
+      <code>supabaseAnonKey</code> con los valores de tu proyecto (Studio → Project Settings → API).</p>
+    </div>`;
+    return;
+  }
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session) { state.user = session.user; await loadAll(); }
+  else render();
+})();
+</script>
+</body>
+</html>

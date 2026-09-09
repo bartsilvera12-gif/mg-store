@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@sb/sb-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{--navy:#0B1F5F;--navy-2:#071433;--blue:#1B49D6;--green:#1EB531;--red:#EC3013;--muted:#5B6480;--soft:#F3F5FA;--line:#E3E7F0}
   *{box-sizing:border-box}
@@ -479,7 +479,7 @@ function fatal(err, hint) {
 (async () => {
   try {
     if (!window.supabase || !window.supabase.createClient) {
-      fatal(new Error('El SDK de Supabase no cargó'), 'Chequeá que https://cdn.jsdelivr.net/npm/@sb/sb-js@2 no esté bloqueado.');
+      fatal(new Error('El SDK de Supabase no cargó'), 'Chequeá que https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2 no esté bloqueado.');
       return;
     }
     if (cfg.supabaseUrl.includes('TU-') || cfg.supabaseAnonKey.startsWith('TU_')) {

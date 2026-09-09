@@ -6,7 +6,10 @@ correlos varias veces sin miedo.
 
 ## Orden de ejecución
 
-En Supabase Studio → **SQL Editor** pegá y ejecutá cada archivo en este orden:
+**Camino fácil:** copiá y pegá `000_all.sql` en Supabase Studio → SQL Editor y
+apretá Run. Corre todo lo demás en orden en una sola transacción.
+
+**Camino manual (recomendado la primera vez para ver los pasos):**
 
 1. `001_schema.sql` — extensiones, tablas (`categories`, `brands`, `products`,
    `orders`, `order_items`), índices, trigger `updated_at`, helper `is_admin()`.
@@ -17,6 +20,9 @@ En Supabase Studio → **SQL Editor** pegá y ejecutá cada archivo en este orde
 4. `004_seed_taxonomy.sql` — carga las 10 categorías y 7 marcas del sitio.
 5. `005_seed_products.sql` — 62 productos con precios, stock y foto local
    (`img/NN.webp`). Migralos a storage cuando quieras (ver más abajo).
+6. `006_admin_user.sql` — marca a `admin@mgstore.com` como `role=admin`
+   editando `raw_app_meta_data` de `auth.users`. Cerrá sesión y volvé a entrar
+   en `admin.html` para que el JWT nuevo traiga el rol.
 
 ## Cómo crear el usuario admin
 

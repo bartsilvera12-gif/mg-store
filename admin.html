@@ -68,9 +68,9 @@
 <!-- CONFIG: cambia por tus valores reales -->
 <script>
   window.MG_ADMIN_CONFIG = {
-    // Cambiá estas dos por lo tuyo antes de abrir el archivo.
-    supabaseUrl: 'https://TU-SUPABASE-URL.supabase.co',
-    supabaseAnonKey: 'TU_ANON_KEY_PUBLICA'
+    supabaseUrl: 'https://api.neura.com.py',
+    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc0MTAxNDYxLCJleHAiOjE5MzE3ODE0NjF9.7_wAph8IolPMXtgfpezSwS5XR62IdD__qhqCywLDp3Q',
+    schema: 'mgstore'
   };
 </script>
 
@@ -79,7 +79,8 @@
 <script>
 const cfg = window.MG_ADMIN_CONFIG;
 const supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
-  auth: { persistSession: true, autoRefreshToken: true }
+  auth: { persistSession: true, autoRefreshToken: true },
+  db: { schema: cfg.schema || 'public' }
 });
 
 const app = document.getElementById('app');
@@ -466,7 +467,7 @@ function renderLogin() {
 // -------------------- boot ------------------------
 
 (async () => {
-  if (!cfg.supabaseUrl.includes('supabase') || cfg.supabaseAnonKey.startsWith('TU_')) {
+  if (cfg.supabaseUrl.includes('TU-') || cfg.supabaseAnonKey.startsWith('TU_')) {
     app.innerHTML = `<div style="padding:40px;max-width:640px;margin:40px auto;background:#fff;border:2px solid var(--red)">
       <h2 style="color:var(--red)">Configurá Supabase</h2>
       <p>Editá <code>admin.html</code> arriba de todo y reemplazá <code>supabaseUrl</code> y

@@ -7,7 +7,7 @@
 <link rel="icon" type="image/png" href="/logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sb/sb-js@2"></script>
 <style>
   :root{--navy:#0B1F5F;--navy-2:#071433;--blue:#1B49D6;--green:#1EB531;--red:#EC3013;--muted:#5B6480;--soft:#F3F5FA;--line:#E3E7F0}
   *{box-sizing:border-box}
@@ -78,7 +78,7 @@
 
 <script>
 const cfg = window.MG_ADMIN_CONFIG;
-const supabase = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
   auth: { persistSession: true, autoRefreshToken: true },
   db: { schema: cfg.schema || 'public' }
 });
@@ -98,10 +98,10 @@ function toast(msg, err) {
 
 async function loadAll() {
   const [p, c, b, o] = await Promise.all([
-    supabase.from('products').select('*, brand:brands(name,slug), category:categories(name,slug)').order('sort_order').order('name'),
-    supabase.from('categories').select('*').order('sort_order').order('name'),
-    supabase.from('brands').select('*').order('sort_order').order('name'),
-    supabase.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(80)
+    sb.from('products').select('*, brand:brands(name,slug), category:categories(name,slug)').order('sort_order').order('name'),
+    sb.from('categories').select('*').order('sort_order').order('name'),
+    sb.from('brands').select('*').order('sort_order').order('name'),
+    sb.from('orders').select('*, order_items(*)').order('created_at', { ascending: false }).limit(80)
   ]);
   if (p.error) { toast(p.error.message, true); return; }
   state.data.products = p.data || [];
@@ -131,7 +131,7 @@ function render() {
     </nav>
     <main>${panel()}</main>`;
   document.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => { state.tab = b.dataset.tab; state.editing = null; render(); });
-  document.querySelector('[data-a="logout"]').onclick = async () => { await supabase.auth.signOut(); state.user = null; render(); };
+  document.querySelector('[data-a="logout"]').onclick = async () => { await sb.auth.signOut(); state.user = null; render(); };
   wireCurrentPanel();
 }
 
@@ -368,7 +368,7 @@ function wireCurrentPanel() {
   document.querySelectorAll('[data-del-brands]').forEach(b => b.onclick = () => del('brands', b.dataset.delBrands));
 
   document.querySelectorAll('[data-order-status]').forEach(sel => sel.onchange = async (e) => {
-    const { error } = await supabase.from('orders').update({ status: e.target.value }).eq('id', sel.dataset.orderStatus);
+    const { error } = await sb.from('orders').update({ status: e.target.value }).eq('id', sel.dataset.orderStatus);
     if (error) toast(error.message, true); else toast('Estado actualizado');
   });
   document.querySelectorAll('[data-order-details]').forEach(b => b.onclick = () => showOrder(b.dataset.orderDetails));
@@ -388,7 +388,7 @@ function renderInline() {
 async function del(table, id) {
   const row = state.data[table].find(x => x.id === id);
   if (!confirm(`¿Borrar "${row?.name || 'esto'}"? No se puede deshacer.`)) return;
-  const { error } = await supabase.from(table).delete().eq('id', id);
+  const { error } = await sb.from(table).delete().eq('id', id);
   if (error) { toast(error.message, true); return; }
   toast('Borrado');
   loadAll();
@@ -410,8 +410,8 @@ async function save(e) {
   // los checkboxes no aparecen en FormData cuando están unchecked
   ['active','featured','on_dark_bg'].forEach(k => { if (!fd.has(k) && form.querySelector(`[name="${k}"]`)) row[k] = false; });
   const q = row.id
-    ? supabase.from(table).update(row).eq('id', row.id)
-    : supabase.from(table).insert(row);
+    ? sb.from(table).update(row).eq('id', row.id)
+    : sb.from(table).insert(row);
   const { error } = await q;
   if (error) { toast(error.message, true); return; }
   toast(row.id ? 'Cambios guardados' : 'Creado');
@@ -424,9 +424,9 @@ async function upload(fileInput) {
   if (!file) return;
   const path = 'products/' + Date.now() + '-' + file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
   toast('Subiendo...');
-  const { error } = await supabase.storage.from('mg-media').upload(path, file, { upsert: false, contentType: file.type });
+  const { error } = await sb.storage.from('mg-media').upload(path, file, { upsert: false, contentType: file.type });
   if (error) { toast(error.message, true); return; }
-  const { data } = supabase.storage.from('mg-media').getPublicUrl(path);
+  const { data } = sb.storage.from('mg-media').getPublicUrl(path);
   const target = fileInput.dataset.target || 'image_url';
   const t = fileInput.form.querySelector(`[name="${target}"]`);
   if (t) t.value = data.publicUrl;
@@ -457,7 +457,7 @@ function renderLogin() {
   document.getElementById('login-form').onsubmit = async (e) => {
     e.preventDefault();
     const fd = new FormData(e.target);
-    const { data, error } = await supabase.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('password') });
+    const { data, error } = await sb.auth.signInWithPassword({ email: fd.get('email'), password: fd.get('password') });
     if (error) { toast(error.message, true); return; }
     state.user = data.user;
     await loadAll();
@@ -479,7 +479,7 @@ function fatal(err, hint) {
 (async () => {
   try {
     if (!window.supabase || !window.supabase.createClient) {
-      fatal(new Error('El SDK de Supabase no cargó'), 'Chequeá que https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2 no esté bloqueado.');
+      fatal(new Error('El SDK de Supabase no cargó'), 'Chequeá que https://cdn.jsdelivr.net/npm/@sb/sb-js@2 no esté bloqueado.');
       return;
     }
     if (cfg.supabaseUrl.includes('TU-') || cfg.supabaseAnonKey.startsWith('TU_')) {
@@ -493,7 +493,7 @@ function fatal(err, hint) {
     if (!ping.ok && ping.status !== 404) {
       throw new Error('Supabase respondió ' + ping.status + ' en /auth/v1/settings');
     }
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session } } = await sb.auth.getSession();
     if (session) { state.user = session.user; await loadAll(); }
     else render();
   } catch (err) {

@@ -1,15 +1,19 @@
 -- MG Store — schema base (Supabase self-hosted).
 -- Idempotente: se puede correr varias veces sin romper.
--- Orden: extensiones -> tablas -> índices -> trigger updated_at -> helper is_admin().
+-- Orden: extensiones -> schema mgstore -> tablas -> índices -> trigger -> is_admin().
+-- Después de correr esto acordate de exponer 'mgstore' en Studio -> Settings -> API.
 
 create extension if not exists "uuid-ossp";
 create extension if not exists "citext";
+create extension if not exists pg_trgm;
+
+create schema if not exists mgstore;
 
 -- ---------------------------------------------------------------------------
 -- Taxonomías
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.categories (
+create table if not exists mgstore.categories (
   id            uuid primary key default uuid_generate_v4(),
   slug          citext unique not null,
   name          text not null,
@@ -21,7 +25,7 @@ create table if not exists public.categories (
   updated_at    timestamptz not null default now()
 );
 
-create table if not exists public.brands (
+create table if not exists mgstore.brands (
   id            uuid primary key default uuid_generate_v4(),
   slug          citext unique not null,
   name          text not null,
@@ -37,13 +41,13 @@ create table if not exists public.brands (
 -- Productos
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.products (
+create table if not exists mgstore.products (
   id                 uuid primary key default uuid_generate_v4(),
   slug               citext unique not null,
   name               text not null,
   description        text,
-  brand_id           uuid references public.brands(id)     on delete set null,
-  category_id        uuid references public.categories(id) on delete set null,
+  brand_id           uuid references mgstore.brands(id)     on delete set null,
+  category_id        uuid references mgstore.categories(id) on delete set null,
   price_gs           integer not null check (price_gs >= 0),
   wholesale_price_gs integer          check (wholesale_price_gs is null or wholesale_price_gs >= 0),
   stock              integer not null default 0 check (stock >= 0),
@@ -56,12 +60,12 @@ create table if not exists public.products (
   updated_at         timestamptz not null default now()
 );
 
-create index if not exists idx_products_category on public.products(category_id);
-create index if not exists idx_products_brand    on public.products(brand_id);
-create index if not exists idx_products_active   on public.products(active) where active;
-create index if not exists idx_products_featured on public.products(featured) where featured;
+create index if not exists idx_products_category on mgstore.products(category_id);
+create index if not exists idx_products_brand    on mgstore.products(brand_id);
+create index if not exists idx_products_active   on mgstore.products(active) where active;
+create index if not exists idx_products_featured on mgstore.products(featured) where featured;
 -- Búsqueda por texto simple sobre name (Postgres FTS con Spanish si querés)
-create index if not exists idx_products_name_trgm on public.products
+create index if not exists idx_products_name_trgm on mgstore.products
   using gin (name gin_trgm_ops);
 create extension if not exists pg_trgm;
 
@@ -69,7 +73,7 @@ create extension if not exists pg_trgm;
 -- Pedidos (para trackear los que llegaron por WhatsApp o para checkout futuro)
 -- ---------------------------------------------------------------------------
 
-create table if not exists public.orders (
+create table if not exists mgstore.orders (
   id             uuid primary key default uuid_generate_v4(),
   order_number   bigserial unique,
   customer_name  text,
@@ -85,10 +89,10 @@ create table if not exists public.orders (
   updated_at     timestamptz not null default now()
 );
 
-create table if not exists public.order_items (
+create table if not exists mgstore.order_items (
   id             uuid primary key default uuid_generate_v4(),
-  order_id       uuid not null references public.orders(id) on delete cascade,
-  product_id     uuid references public.products(id) on delete set null,
+  order_id       uuid not null references mgstore.orders(id) on delete cascade,
+  product_id     uuid references mgstore.products(id) on delete set null,
   product_name   text not null,      -- snapshot
   brand_name     text,               -- snapshot
   quantity       integer not null default 1 check (quantity > 0),
@@ -97,15 +101,15 @@ create table if not exists public.order_items (
   created_at     timestamptz not null default now()
 );
 
-create index if not exists idx_order_items_order on public.order_items(order_id);
-create index if not exists idx_orders_status     on public.orders(status);
-create index if not exists idx_orders_created    on public.orders(created_at desc);
+create index if not exists idx_order_items_order on mgstore.order_items(order_id);
+create index if not exists idx_orders_status     on mgstore.orders(status);
+create index if not exists idx_orders_created    on mgstore.orders(created_at desc);
 
 -- ---------------------------------------------------------------------------
 -- Trigger updated_at
 -- ---------------------------------------------------------------------------
 
-create or replace function public.tg_set_updated_at()
+create or replace function mgstore.tg_set_updated_at()
 returns trigger language plpgsql as $$
 begin
   new.updated_at = now();
@@ -118,10 +122,10 @@ declare t text;
 begin
   for t in select unnest(array['categories','brands','products','orders'])
   loop
-    execute format('drop trigger if exists set_updated_at on public.%I', t);
+    execute format('drop trigger if exists set_updated_at on mgstore.%I', t);
     execute format(
-      'create trigger set_updated_at before update on public.%I ' ||
-      'for each row execute function public.tg_set_updated_at()', t
+      'create trigger set_updated_at before update on mgstore.%I ' ||
+      'for each row execute function mgstore.tg_set_updated_at()', t
     );
   end loop;
 end $$;
@@ -131,7 +135,7 @@ end $$;
 -- vale 'admin'. Se setea con supabase-cli o desde Studio en el user metadata.
 -- ---------------------------------------------------------------------------
 
-create or replace function public.is_admin()
+create or replace function mgstore.is_admin()
 returns boolean language sql stable as $$
   select coalesce(
     (auth.jwt() -> 'app_metadata' ->> 'role') = 'admin',
@@ -143,53 +147,53 @@ $$;
 -- Lectura pública para el catálogo, escritura sólo para admin,
 -- pedidos: cualquier anon puede insertar (para el checkout), solo admin lee.
 
-alter table public.categories  enable row level security;
-alter table public.brands      enable row level security;
-alter table public.products    enable row level security;
-alter table public.orders      enable row level security;
-alter table public.order_items enable row level security;
+alter table mgstore.categories  enable row level security;
+alter table mgstore.brands      enable row level security;
+alter table mgstore.products    enable row level security;
+alter table mgstore.orders      enable row level security;
+alter table mgstore.order_items enable row level security;
 
 -- Nada de "if not exists" para policies antes de PG 15+ — dropeamos y recreamos.
-drop policy if exists categories_public_read on public.categories;
-drop policy if exists categories_admin_write on public.categories;
-drop policy if exists brands_public_read     on public.brands;
-drop policy if exists brands_admin_write     on public.brands;
-drop policy if exists products_public_read   on public.products;
-drop policy if exists products_admin_write   on public.products;
-drop policy if exists orders_public_insert   on public.orders;
-drop policy if exists orders_admin_select    on public.orders;
-drop policy if exists orders_admin_update    on public.orders;
-drop policy if exists order_items_public_insert on public.order_items;
-drop policy if exists order_items_admin_select  on public.order_items;
+drop policy if exists categories_public_read on mgstore.categories;
+drop policy if exists categories_admin_write on mgstore.categories;
+drop policy if exists brands_public_read     on mgstore.brands;
+drop policy if exists brands_admin_write     on mgstore.brands;
+drop policy if exists products_public_read   on mgstore.products;
+drop policy if exists products_admin_write   on mgstore.products;
+drop policy if exists orders_public_insert   on mgstore.orders;
+drop policy if exists orders_admin_select    on mgstore.orders;
+drop policy if exists orders_admin_update    on mgstore.orders;
+drop policy if exists order_items_public_insert on mgstore.order_items;
+drop policy if exists order_items_admin_select  on mgstore.order_items;
 
 -- Lectura pública: cualquier fila activa; los admins ven todo.
-create policy categories_public_read on public.categories for select
-  using (active or public.is_admin());
-create policy brands_public_read on public.brands for select
-  using (active or public.is_admin());
-create policy products_public_read on public.products for select
-  using (active or public.is_admin());
+create policy categories_public_read on mgstore.categories for select
+  using (active or mgstore.is_admin());
+create policy brands_public_read on mgstore.brands for select
+  using (active or mgstore.is_admin());
+create policy products_public_read on mgstore.products for select
+  using (active or mgstore.is_admin());
 
 -- Escritura: solo admins.
-create policy categories_admin_write on public.categories for all
-  using (public.is_admin()) with check (public.is_admin());
-create policy brands_admin_write on public.brands for all
-  using (public.is_admin()) with check (public.is_admin());
-create policy products_admin_write on public.products for all
-  using (public.is_admin()) with check (public.is_admin());
+create policy categories_admin_write on mgstore.categories for all
+  using (mgstore.is_admin()) with check (mgstore.is_admin());
+create policy brands_admin_write on mgstore.brands for all
+  using (mgstore.is_admin()) with check (mgstore.is_admin());
+create policy products_admin_write on mgstore.products for all
+  using (mgstore.is_admin()) with check (mgstore.is_admin());
 
 -- Orders: cualquiera puede crear un pedido (checkout), solo admin lee/actualiza.
-create policy orders_public_insert on public.orders for insert
+create policy orders_public_insert on mgstore.orders for insert
   with check (true);
-create policy orders_admin_select on public.orders for select
-  using (public.is_admin());
-create policy orders_admin_update on public.orders for update
-  using (public.is_admin()) with check (public.is_admin());
+create policy orders_admin_select on mgstore.orders for select
+  using (mgstore.is_admin());
+create policy orders_admin_update on mgstore.orders for update
+  using (mgstore.is_admin()) with check (mgstore.is_admin());
 
-create policy order_items_public_insert on public.order_items for insert
+create policy order_items_public_insert on mgstore.order_items for insert
   with check (true);
-create policy order_items_admin_select on public.order_items for select
-  using (public.is_admin());
+create policy order_items_admin_select on mgstore.order_items for select
+  using (mgstore.is_admin());
 -- MG Store — bucket público 'mg-media' para imágenes de productos, logos y hero.
 -- Lectura pública para servir en el frontend; escritura solo admin.
 
@@ -206,18 +210,31 @@ create policy mg_media_public_read on storage.objects for select
   using (bucket_id = 'mg-media');
 
 create policy mg_media_admin_insert on storage.objects for insert
-  with check (bucket_id = 'mg-media' and public.is_admin());
+  with check (bucket_id = 'mg-media' and mgstore.is_admin());
 
 create policy mg_media_admin_update on storage.objects for update
-  using (bucket_id = 'mg-media' and public.is_admin())
-  with check (bucket_id = 'mg-media' and public.is_admin());
+  using (bucket_id = 'mg-media' and mgstore.is_admin())
+  with check (bucket_id = 'mg-media' and mgstore.is_admin());
 
 create policy mg_media_admin_delete on storage.objects for delete
-  using (bucket_id = 'mg-media' and public.is_admin());
+  using (bucket_id = 'mg-media' and mgstore.is_admin());
+-- MG Store — GRANTS para exponer el schema mgstore vía PostgREST.
+-- Sin esto la API de Supabase no ve las tablas aunque el schema esté "exposed".
+
+grant usage on schema mgstore to anon, authenticated, service_role;
+grant select                       on all tables    in schema mgstore to anon, authenticated;
+grant insert, update, delete       on all tables    in schema mgstore to authenticated;
+grant all                          on all tables    in schema mgstore to service_role;
+grant all                          on all sequences in schema mgstore to authenticated, service_role;
+grant execute                      on all functions in schema mgstore to anon, authenticated, service_role;
+
+alter default privileges in schema mgstore grant select on tables    to anon, authenticated;
+alter default privileges in schema mgstore grant all    on tables    to service_role;
+alter default privileges in schema mgstore grant all    on sequences to authenticated, service_role;
 -- MG Store — seed de categorías y marcas (matchean el hardcode del frontend).
 -- Idempotente: on conflict do nothing.
 
-insert into public.categories (slug, name, sort_order) values
+insert into mgstore.categories (slug, name, sort_order) values
   ('drones',            'Drones',              10),
   ('vehiculos-rc',      'Vehículos RC',        20),
   ('bloques-armables',  'Bloques y armables',  30),
@@ -230,7 +247,7 @@ insert into public.categories (slug, name, sort_order) values
   ('cuidado-personal',  'Cuidado personal',   100)
 on conflict (slug) do nothing;
 
-insert into public.brands (slug, name, on_dark_bg, sort_order) values
+insert into mgstore.brands (slug, name, on_dark_bg, sort_order) values
   ('ecopower',   'Ecopower',   false, 10),
   ('satellite',  'Satellite',  true,  20), -- SATE con fondo oscuro
   ('luo',        'LUO',        false, 30),
@@ -243,72 +260,72 @@ on conflict (slug) do nothing;
 -- Los image_url apuntan a los assets ya en el repo; migralos a storage
 -- cuando quieras y actualizá esta columna.
 
-insert into public.products (slug, name, brand_id, category_id, price_gs, wholesale_price_gs, stock, featured, image_url, sort_order) values
-  ('mini-masajeador-portatil-ecopower-01', 'Mini Masajeador Portatil Ecopower', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='cuidado-personal'), 130000, 90000, 18, true, 'img/07.webp', 0),
-  ('linterna-kit-de-herramientas-ecopower-02', 'Linterna + Kit de herramientas Ecopower', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='herramientas'), 150000, 100000, 18, true, 'img/06.webp', 10),
-  ('avion-dron-a-control-remoto-con-4-helices-03', 'AVIÓN DRON A CONTROL REMOTO CON 4 HÉLICES', null, (select id from public.categories where slug='drones'), 150000, 110000, 5, false, 'img/62.webp', 20),
-  ('rosa-roja-en-maceta-de-bloques-para-armar-04', 'ROSA ROJA EN MACETA DE BLOQUES PARA ARMAR', null, (select id from public.categories where slug='bloques-armables'), 120000, 75000, 5, false, 'img/61.webp', 30),
-  ('motocicleta-kawasaki-ninja-zx-10r-de-bloques-867-piezas-05', 'MOTOCICLETA KAWASAKI NINJA ZX-10R DE BLOQUES – 867 PIEZAS', null, (select id from public.categories where slug='bloques-armables'), 180000, 135000, 2, false, 'img/60.webp', 40),
-  ('jeep-wrangler-de-bloques-jie-star-391-piezas-06', 'JEEP WRANGLER DE BLOQUES JIE STAR – 391 PIEZAS', (select id from public.brands where slug='jie-star'), (select id from public.categories where slug='bloques-armables'), 180000, 130000, 3, false, 'img/59.webp', 50),
-  ('camion-semirremolque-de-bloques-apengbaol-268-piezas-07', 'CAMIÓN SEMIRREMOLQUE DE BLOQUES APENGBAOL – 268 PIEZAS', (select id from public.brands where slug='apengbaol'), (select id from public.categories where slug='bloques-armables'), 120000, 80000, 3, false, 'img/58.webp', 60),
-  ('ferrari-f50-de-bloques-mould-king-396-piezas-08', 'FERRARI F50 DE BLOQUES MOULD KING – 396 PIEZAS', (select id from public.brands where slug='mould-king'), (select id from public.categories where slug='bloques-armables'), 150000, 100000, 4, false, 'img/57.webp', 70),
-  ('autobus-a-control-remoto-recargable-09', 'AUTOBÚS A CONTROL REMOTO RECARGABLE', null, (select id from public.categories where slug='vehiculos-rc'), 180000, 130000, 3, false, 'img/56.webp', 80),
-  ('camioneta-4x4-todoterreno-a-control-remoto-40-km-h-10', 'CAMIONETA 4X4 TODOTERRENO A CONTROL REMOTO – 40 KM/H', null, (select id from public.categories where slug='vehiculos-rc'), 390000, 320000, 1, false, 'img/55.webp', 90),
-  ('mini-camioneta-monster-a-control-remoto-11', 'MINI CAMIONETA MONSTER A CONTROL REMOTO', null, (select id from public.categories where slug='vehiculos-rc'), 100000, 65000, 5, false, 'img/54.webp', 100),
-  ('grua-de-construccion-a-control-remoto-12', 'GRÚA DE CONSTRUCCIÓN A CONTROL REMOTO', null, (select id from public.categories where slug='vehiculos-rc'), 150000, 100000, 5, false, 'img/53.webp', 110),
-  ('camion-de-bomberos-a-control-remoto-con-luces-y-sonidos-13', 'CAMIÓN DE BOMBEROS A CONTROL REMOTO CON LUCES Y SONIDOS', null, (select id from public.categories where slug='vehiculos-rc'), 150000, 100000, 4, false, 'img/52.webp', 120),
-  ('camion-volquete-a-control-remoto-de-9-funciones-14', 'CAMIÓN VOLQUETE A CONTROL REMOTO DE 9 FUNCIONES', null, (select id from public.categories where slug='vehiculos-rc'), 170000, 120000, 4, false, 'img/51.webp', 130),
-  ('auto-anfibio-a-control-remoto-con-pistola-de-agua-15', 'AUTO ANFIBIO A CONTROL REMOTO CON PISTOLA DE AGUA', null, (select id from public.categories where slug='vehiculos-rc'), 220000, 160000, 2, false, 'img/50.webp', 140),
-  ('puente-de-londres-tower-bridge-2-300-piezas-16', 'PUENTE DE LONDRES TOWER BRIDGE – 2.300+ PIEZAS', null, (select id from public.categories where slug='bloques-armables'), 150000, 100000, 4, false, 'img/49.webp', 150),
-  ('torre-eiffel-3d-de-bloques-17', 'TORRE EIFFEL 3D DE BLOQUES', null, (select id from public.categories where slug='bloques-armables'), 110000, 80000, 9, false, 'img/48.webp', 160),
-  ('auto-acrobatico-rc-con-giro-360-18', 'AUTO ACROBÁTICO RC CON GIRO 360°', null, (select id from public.categories where slug='vehiculos-rc'), 150000, 95000, 10, false, 'img/47.webp', 170),
-  ('auto-acrobatico-a-control-remoto-de-6-ruedas-con-vapor-19', 'AUTO ACROBÁTICO A CONTROL REMOTO DE 6 RUEDAS CON VAPOR', null, (select id from public.categories where slug='vehiculos-rc'), 150000, 105000, 5, false, 'img/46.webp', 180),
-  ('excavadora-a-control-remoto-con-giro-360-y-brazo-articulado-20', 'EXCAVADORA A CONTROL REMOTO CON GIRO 360° Y BRAZO ARTICULADO', null, (select id from public.categories where slug='vehiculos-rc'), 230000, 180000, 3, false, 'img/45.webp', 190),
-  ('bloques-magneticos-tipo-minecraft-150-piezas-21', 'BLOQUES MAGNÉTICOS TIPO MINECRAFT – 150 PIEZAS', null, (select id from public.categories where slug='bloques-armables'), 150000, 100000, 6, false, 'img/44.webp', 200),
-  ('bloques-magneticos-tipo-minecraft-100-piezas-22', 'BLOQUES MAGNÉTICOS TIPO MINECRAFT – 100 PIEZAS', null, (select id from public.categories where slug='bloques-armables'), 120000, 80000, 5, false, 'img/43.webp', 210),
-  ('nissan-skyline-gt-r-r34-escala-1-24-23', 'NISSAN SKYLINE GT-R R34 ESCALA 1:24', null, (select id from public.categories where slug='vehiculos-rc'), 150000, 100000, 3, false, 'img/42.webp', 220),
-  ('juego-de-mesa-basta-24', 'JUEGO DE MESA BASTA', null, (select id from public.categories where slug='juegos'), 99000, 65000, 5, false, 'img/41.webp', 230),
-  ('dron-max-con-camara-dual-y-luces-rgb-25', 'DRON MAX CON CÁMARA DUAL Y LUCES RGB', null, (select id from public.categories where slug='drones'), 290000, 220000, 5, false, 'img/40.webp', 240),
-  ('cocina-infantil-my-happy-kitchen-con-luz-y-sonido-26', 'COCINA INFANTIL MY HAPPY KITCHEN CON LUZ Y SONIDO', null, (select id from public.categories where slug='juegos'), 150000, 105000, 2, false, 'img/39.webp', 250),
-  ('aro-de-luz-ecopower-ep-t102-con-tripode-27', 'ARO DE LUZ ECOPOWER EP-T102 CON TRÍPODE', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='foto-video'), 230000, 185000, 1, false, 'img/37.webp', 260),
-  ('camara-de-seguridad-wifi-ecopower-ep-c088-3mp-ip66-28', 'CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C088 3MP IP66', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='tecnologia'), 270000, 220000, 2, false, 'img/36.webp', 270),
-  ('camara-de-seguridad-wifi-ecopower-ep-c068-3mp-29', 'CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C068 3MP', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='tecnologia'), 220000, 170000, 2, false, 'img/35.webp', 280),
-  ('camara-retrovisor-para-auto-ecopower-ep-8777-con-doble-camar-30', 'Cámara Retrovisor para Auto Ecopower EP-8777 con Doble Cámara Full HD', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='tecnologia'), 270000, 220000, 1, false, 'img/34.webp', 290),
-  ('camara-dvr-para-auto-ecopower-ep-8775-full-hd-con-camara-tra-31', 'Cámara DVR para Auto Ecopower EP-8775 Full HD con Cámara Trasera', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='tecnologia'), 220000, 170000, 2, false, 'img/33.webp', 300),
-  ('fuente-bebedero-para-gatos-sate-a-mf8271-con-filtro-1-8-litr-32', 'Fuente Bebedero para Gatos SATE A-MF8271 con Filtro – 1,8 Litros', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='hogar-mascotas'), 130000, 90000, 4, false, 'img/32.webp', 310),
-  ('destornillador-electrico-recargable-sate-a-ks29-con-29-punta-33', 'Destornillador Eléctrico Recargable SATE A-KS29 con 29 Puntas', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='herramientas'), 180000, 135000, 4, false, 'img/31.webp', 320),
-  ('caja-de-herramientas-sate-a-tk884-con-taladro-inalambrico-34', 'Caja de Herramientas SATE A-TK884 con Taladro Inalámbrico', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='herramientas'), 255000, 205000, 4, false, 'img/30.webp', 330),
-  ('auricular-gamer-sate-gh-554-con-microfono-y-luces-rgb-35', 'Auricular Gamer SATE GH-554 con Micrófono y Luces RGB', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='audio'), 130000, 85000, 2, false, 'img/29.webp', 340),
-  ('aspiradora-portatil-y-soplador-sate-a-cv1103w-recargable-36', 'Aspiradora Portátil y Soplador SATE A-CV1103W Recargable', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='hogar-mascotas'), 125000, 85000, 6, false, 'img/28.webp', 350),
-  ('tripode-para-videos-sate-a-rm900k-con-luz-led-y-microfono-37', 'Trípode para Videos SATE A-RM900K con Luz LED y Micrófono', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='foto-video'), 160000, 112000, 2, false, 'img/27.webp', 360),
-  ('tripode-para-videos-sate-a-rm900g-con-luz-led-y-microfono-38', 'Trípode para Videos SATE A-RM900G con Luz LED y Micrófono', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='foto-video'), 160000, 112000, 2, false, 'img/26.webp', 370),
-  ('palo-de-selfie-con-tripode-y-control-inalambrico-sate-a-rm80-39', 'Palo de Selfie con Trípode y Control Inalámbrico SATE A-RM800D', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='foto-video'), 220000, 172000, 2, false, 'img/25.webp', 380),
-  ('maquina-de-boxeo-musical-sate-a-mlb11-con-bluetooth-y-guante-40', 'Máquina de Boxeo Musical SATE A-MLB11 con Bluetooth y Guantes', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='juegos'), 255000, 208000, 3, false, 'img/24.webp', 390),
-  ('mini-motosierra-recargable-sate-a-tk881-con-2-baterias-41', 'Mini Motosierra Recargable SATE A-TK881 con 2 Baterías', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='herramientas'), 290000, 230000, 2, false, 'img/23.webp', 400),
-  ('kit-gamer-satellite-gk-54-rgb-5-en-1-42', 'Kit Gamer Satellite GK-54 RGB – 5 en 1', (select id from public.brands where slug='satellite'), (select id from public.categories where slug='tecnologia'), 260000, 195000, 3, false, 'img/22.webp', 410),
-  ('drone-plegable-con-camara-hd-wi-fi-y-estuche-43', 'Drone Plegable con Cámara HD, Wi-Fi y Estuche', null, (select id from public.categories where slug='drones'), 150000, 95000, 4, false, 'img/21.webp', 420),
-  ('drone-avion-con-camara-hd-luces-led-y-2-baterias-44', 'Drone Avión con Cámara HD, Luces LED y 2 Baterías', null, (select id from public.categories where slug='drones'), 140000, 90000, 4, false, 'img/20.webp', 430),
-  ('dron-cuadricoptero-luk-con-camara-hd-y-2-baterias-45', 'Dron Cuadricóptero LUK con Cámara HD y 2 Baterías', (select id from public.brands where slug='luk'), (select id from public.categories where slug='drones'), 170000, 115000, 6, false, 'img/19.webp', 440),
-  ('mini-drone-quadricoptero-plegable-con-camara-46', 'Mini Drone Quadricóptero Plegable con Cámara', null, (select id from public.categories where slug='drones'), 150000, 95000, 5, false, 'img/18.webp', 450),
-  ('drone-quadricoptero-con-camara-hd-y-control-con-pantalla-47', 'Drone Quadricóptero con Cámara HD y Control con Pantalla', null, (select id from public.categories where slug='drones'), 220000, 145000, 5, false, 'img/17.webp', 460),
-  ('tabla-de-boxeo-musical-interactiva-con-luces-y-guantes-48', 'Tabla de Boxeo Musical Interactiva con Luces y Guantes', null, (select id from public.categories where slug='juegos'), 150000, 105000, 5, false, 'img/16.webp', 470),
-  ('auto-acrobatico-a-control-remoto-con-luces-led-musica-y-giro-49', 'Auto Acrobático a Control Remoto con Luces LED, Música y Giro 360°', null, (select id from public.categories where slug='vehiculos-rc'), 145000, 95000, 6, false, 'img/38.webp', 480),
-  ('titanic-armable-con-bloques-607-piezas-50', 'Titanic Armable con Bloques – 607 piezas', null, (select id from public.categories where slug='bloques-armables'), 80000, 45000, 8, false, 'img/15.webp', 490),
-  ('auto-deportivo-armable-con-bloques-escala-1-14-51', 'Auto Deportivo Armable con Bloques – Escala 1:14', null, (select id from public.categories where slug='bloques-armables'), 190000, 135000, 1, false, 'img/14.webp', 500),
-  ('estadio-santiago-bernabeu-101-piezas-puzzle-3d-52', 'Estadio Santiago Bernabéu – 101 piezas - Puzzle 3D', null, (select id from public.categories where slug='bloques-armables'), 120000, 65000, 9, false, 'img/13.webp', 510),
-  ('speaker-ecopower-ep-s107-53', 'SPEAKER ECOPOWER EP-S107', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='audio'), 260000, 215000, 2, false, 'img/12.webp', 520),
-  ('speaker-ecopower-ep-1960-6-5-60-w-bluetooth-negro-54', 'Speaker Ecopower EP-1960 6.5" 60 W Bluetooth - Negro', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='audio'), 535000, 435000, 2, false, 'img/11.webp', 530),
-  ('walkie-talkie-luo-lu-820s-55', 'WALKIE TALKIE LUO LU-820S', (select id from public.brands where slug='luo'), (select id from public.categories where slug='tecnologia'), 195000, 140000, 3, false, 'img/10.webp', 540),
-  ('smartwatch-luo-w8-ultra-49mm-naranja-56', 'SMARTWATCH LUO W8 ULTRA - 49MM - NARANJA', (select id from public.brands where slug='luo'), (select id from public.categories where slug='tecnologia'), 120000, 80000, 2, false, 'img/09.webp', 550),
-  ('speaker-astronauta-con-led-lu-2111-57', 'SPEAKER ASTRONAUTA CON LED LU-2111', (select id from public.brands where slug='luo'), (select id from public.categories where slug='audio'), 145000, 105000, 2, false, 'img/08.webp', 560),
-  ('cargador-portatil-de-33-000-mah-ecopower-ep-c838-58', 'CARGADOR PORTATIL DE 33.000 mAh - ECOPOWER / EP-C838', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='tecnologia'), 190000, 140000, 4, false, 'img/05.webp', 570),
-  ('camara-infantil-luo-lu-x209-con-display-azul-59', 'CAMARA INFANTIL LUO LU-X209 / CON DISPLAY / AZUL', (select id from public.brands where slug='luo'), (select id from public.categories where slug='foto-video'), 130000, 80000, 2, false, 'img/04.webp', 580),
-  ('auricular-con-bluetooth-recargable-diseno-infantil-lu-993-60', 'Auricular Con Bluetooth Recargable Diseño Infantil / LU-993', (select id from public.brands where slug='luo'), (select id from public.categories where slug='audio'), 130000, 90000, 2, false, 'img/03.webp', 590),
-  ('auricular-inalambrico-ecopower-ep-h150-61', 'AURICULAR INALÁMBRICO ECOPOWER EP-H150', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='audio'), 120000, 76000, 3, false, 'img/02.webp', 600),
-  ('corta-pelo-ep-2811-ecopower-62', 'CORTA PELO EP-2811 ECOPOWER', (select id from public.brands where slug='ecopower'), (select id from public.categories where slug='cuidado-personal'), 260000, 195000, 2, false, 'img/01.webp', 610)
+insert into mgstore.products (slug, name, brand_id, category_id, price_gs, wholesale_price_gs, stock, featured, image_url, sort_order) values
+  ('mini-masajeador-portatil-ecopower-01', 'Mini Masajeador Portatil Ecopower', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='cuidado-personal'), 130000, 90000, 18, true, 'img/07.webp', 0),
+  ('linterna-kit-de-herramientas-ecopower-02', 'Linterna + Kit de herramientas Ecopower', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='herramientas'), 150000, 100000, 18, true, 'img/06.webp', 10),
+  ('avion-dron-a-control-remoto-con-4-helices-03', 'AVIÓN DRON A CONTROL REMOTO CON 4 HÉLICES', null, (select id from mgstore.categories where slug='drones'), 150000, 110000, 5, false, 'img/62.webp', 20),
+  ('rosa-roja-en-maceta-de-bloques-para-armar-04', 'ROSA ROJA EN MACETA DE BLOQUES PARA ARMAR', null, (select id from mgstore.categories where slug='bloques-armables'), 120000, 75000, 5, false, 'img/61.webp', 30),
+  ('motocicleta-kawasaki-ninja-zx-10r-de-bloques-867-piezas-05', 'MOTOCICLETA KAWASAKI NINJA ZX-10R DE BLOQUES – 867 PIEZAS', null, (select id from mgstore.categories where slug='bloques-armables'), 180000, 135000, 2, false, 'img/60.webp', 40),
+  ('jeep-wrangler-de-bloques-jie-star-391-piezas-06', 'JEEP WRANGLER DE BLOQUES JIE STAR – 391 PIEZAS', (select id from mgstore.brands where slug='jie-star'), (select id from mgstore.categories where slug='bloques-armables'), 180000, 130000, 3, false, 'img/59.webp', 50),
+  ('camion-semirremolque-de-bloques-apengbaol-268-piezas-07', 'CAMIÓN SEMIRREMOLQUE DE BLOQUES APENGBAOL – 268 PIEZAS', (select id from mgstore.brands where slug='apengbaol'), (select id from mgstore.categories where slug='bloques-armables'), 120000, 80000, 3, false, 'img/58.webp', 60),
+  ('ferrari-f50-de-bloques-mould-king-396-piezas-08', 'FERRARI F50 DE BLOQUES MOULD KING – 396 PIEZAS', (select id from mgstore.brands where slug='mould-king'), (select id from mgstore.categories where slug='bloques-armables'), 150000, 100000, 4, false, 'img/57.webp', 70),
+  ('autobus-a-control-remoto-recargable-09', 'AUTOBÚS A CONTROL REMOTO RECARGABLE', null, (select id from mgstore.categories where slug='vehiculos-rc'), 180000, 130000, 3, false, 'img/56.webp', 80),
+  ('camioneta-4x4-todoterreno-a-control-remoto-40-km-h-10', 'CAMIONETA 4X4 TODOTERRENO A CONTROL REMOTO – 40 KM/H', null, (select id from mgstore.categories where slug='vehiculos-rc'), 390000, 320000, 1, false, 'img/55.webp', 90),
+  ('mini-camioneta-monster-a-control-remoto-11', 'MINI CAMIONETA MONSTER A CONTROL REMOTO', null, (select id from mgstore.categories where slug='vehiculos-rc'), 100000, 65000, 5, false, 'img/54.webp', 100),
+  ('grua-de-construccion-a-control-remoto-12', 'GRÚA DE CONSTRUCCIÓN A CONTROL REMOTO', null, (select id from mgstore.categories where slug='vehiculos-rc'), 150000, 100000, 5, false, 'img/53.webp', 110),
+  ('camion-de-bomberos-a-control-remoto-con-luces-y-sonidos-13', 'CAMIÓN DE BOMBEROS A CONTROL REMOTO CON LUCES Y SONIDOS', null, (select id from mgstore.categories where slug='vehiculos-rc'), 150000, 100000, 4, false, 'img/52.webp', 120),
+  ('camion-volquete-a-control-remoto-de-9-funciones-14', 'CAMIÓN VOLQUETE A CONTROL REMOTO DE 9 FUNCIONES', null, (select id from mgstore.categories where slug='vehiculos-rc'), 170000, 120000, 4, false, 'img/51.webp', 130),
+  ('auto-anfibio-a-control-remoto-con-pistola-de-agua-15', 'AUTO ANFIBIO A CONTROL REMOTO CON PISTOLA DE AGUA', null, (select id from mgstore.categories where slug='vehiculos-rc'), 220000, 160000, 2, false, 'img/50.webp', 140),
+  ('puente-de-londres-tower-bridge-2-300-piezas-16', 'PUENTE DE LONDRES TOWER BRIDGE – 2.300+ PIEZAS', null, (select id from mgstore.categories where slug='bloques-armables'), 150000, 100000, 4, false, 'img/49.webp', 150),
+  ('torre-eiffel-3d-de-bloques-17', 'TORRE EIFFEL 3D DE BLOQUES', null, (select id from mgstore.categories where slug='bloques-armables'), 110000, 80000, 9, false, 'img/48.webp', 160),
+  ('auto-acrobatico-rc-con-giro-360-18', 'AUTO ACROBÁTICO RC CON GIRO 360°', null, (select id from mgstore.categories where slug='vehiculos-rc'), 150000, 95000, 10, false, 'img/47.webp', 170),
+  ('auto-acrobatico-a-control-remoto-de-6-ruedas-con-vapor-19', 'AUTO ACROBÁTICO A CONTROL REMOTO DE 6 RUEDAS CON VAPOR', null, (select id from mgstore.categories where slug='vehiculos-rc'), 150000, 105000, 5, false, 'img/46.webp', 180),
+  ('excavadora-a-control-remoto-con-giro-360-y-brazo-articulado-20', 'EXCAVADORA A CONTROL REMOTO CON GIRO 360° Y BRAZO ARTICULADO', null, (select id from mgstore.categories where slug='vehiculos-rc'), 230000, 180000, 3, false, 'img/45.webp', 190),
+  ('bloques-magneticos-tipo-minecraft-150-piezas-21', 'BLOQUES MAGNÉTICOS TIPO MINECRAFT – 150 PIEZAS', null, (select id from mgstore.categories where slug='bloques-armables'), 150000, 100000, 6, false, 'img/44.webp', 200),
+  ('bloques-magneticos-tipo-minecraft-100-piezas-22', 'BLOQUES MAGNÉTICOS TIPO MINECRAFT – 100 PIEZAS', null, (select id from mgstore.categories where slug='bloques-armables'), 120000, 80000, 5, false, 'img/43.webp', 210),
+  ('nissan-skyline-gt-r-r34-escala-1-24-23', 'NISSAN SKYLINE GT-R R34 ESCALA 1:24', null, (select id from mgstore.categories where slug='vehiculos-rc'), 150000, 100000, 3, false, 'img/42.webp', 220),
+  ('juego-de-mesa-basta-24', 'JUEGO DE MESA BASTA', null, (select id from mgstore.categories where slug='juegos'), 99000, 65000, 5, false, 'img/41.webp', 230),
+  ('dron-max-con-camara-dual-y-luces-rgb-25', 'DRON MAX CON CÁMARA DUAL Y LUCES RGB', null, (select id from mgstore.categories where slug='drones'), 290000, 220000, 5, false, 'img/40.webp', 240),
+  ('cocina-infantil-my-happy-kitchen-con-luz-y-sonido-26', 'COCINA INFANTIL MY HAPPY KITCHEN CON LUZ Y SONIDO', null, (select id from mgstore.categories where slug='juegos'), 150000, 105000, 2, false, 'img/39.webp', 250),
+  ('aro-de-luz-ecopower-ep-t102-con-tripode-27', 'ARO DE LUZ ECOPOWER EP-T102 CON TRÍPODE', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='foto-video'), 230000, 185000, 1, false, 'img/37.webp', 260),
+  ('camara-de-seguridad-wifi-ecopower-ep-c088-3mp-ip66-28', 'CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C088 3MP IP66', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='tecnologia'), 270000, 220000, 2, false, 'img/36.webp', 270),
+  ('camara-de-seguridad-wifi-ecopower-ep-c068-3mp-29', 'CÁMARA DE SEGURIDAD WIFI ECOPOWER EP-C068 3MP', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='tecnologia'), 220000, 170000, 2, false, 'img/35.webp', 280),
+  ('camara-retrovisor-para-auto-ecopower-ep-8777-con-doble-camar-30', 'Cámara Retrovisor para Auto Ecopower EP-8777 con Doble Cámara Full HD', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='tecnologia'), 270000, 220000, 1, false, 'img/34.webp', 290),
+  ('camara-dvr-para-auto-ecopower-ep-8775-full-hd-con-camara-tra-31', 'Cámara DVR para Auto Ecopower EP-8775 Full HD con Cámara Trasera', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='tecnologia'), 220000, 170000, 2, false, 'img/33.webp', 300),
+  ('fuente-bebedero-para-gatos-sate-a-mf8271-con-filtro-1-8-litr-32', 'Fuente Bebedero para Gatos SATE A-MF8271 con Filtro – 1,8 Litros', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='hogar-mascotas'), 130000, 90000, 4, false, 'img/32.webp', 310),
+  ('destornillador-electrico-recargable-sate-a-ks29-con-29-punta-33', 'Destornillador Eléctrico Recargable SATE A-KS29 con 29 Puntas', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='herramientas'), 180000, 135000, 4, false, 'img/31.webp', 320),
+  ('caja-de-herramientas-sate-a-tk884-con-taladro-inalambrico-34', 'Caja de Herramientas SATE A-TK884 con Taladro Inalámbrico', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='herramientas'), 255000, 205000, 4, false, 'img/30.webp', 330),
+  ('auricular-gamer-sate-gh-554-con-microfono-y-luces-rgb-35', 'Auricular Gamer SATE GH-554 con Micrófono y Luces RGB', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='audio'), 130000, 85000, 2, false, 'img/29.webp', 340),
+  ('aspiradora-portatil-y-soplador-sate-a-cv1103w-recargable-36', 'Aspiradora Portátil y Soplador SATE A-CV1103W Recargable', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='hogar-mascotas'), 125000, 85000, 6, false, 'img/28.webp', 350),
+  ('tripode-para-videos-sate-a-rm900k-con-luz-led-y-microfono-37', 'Trípode para Videos SATE A-RM900K con Luz LED y Micrófono', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='foto-video'), 160000, 112000, 2, false, 'img/27.webp', 360),
+  ('tripode-para-videos-sate-a-rm900g-con-luz-led-y-microfono-38', 'Trípode para Videos SATE A-RM900G con Luz LED y Micrófono', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='foto-video'), 160000, 112000, 2, false, 'img/26.webp', 370),
+  ('palo-de-selfie-con-tripode-y-control-inalambrico-sate-a-rm80-39', 'Palo de Selfie con Trípode y Control Inalámbrico SATE A-RM800D', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='foto-video'), 220000, 172000, 2, false, 'img/25.webp', 380),
+  ('maquina-de-boxeo-musical-sate-a-mlb11-con-bluetooth-y-guante-40', 'Máquina de Boxeo Musical SATE A-MLB11 con Bluetooth y Guantes', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='juegos'), 255000, 208000, 3, false, 'img/24.webp', 390),
+  ('mini-motosierra-recargable-sate-a-tk881-con-2-baterias-41', 'Mini Motosierra Recargable SATE A-TK881 con 2 Baterías', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='herramientas'), 290000, 230000, 2, false, 'img/23.webp', 400),
+  ('kit-gamer-satellite-gk-54-rgb-5-en-1-42', 'Kit Gamer Satellite GK-54 RGB – 5 en 1', (select id from mgstore.brands where slug='satellite'), (select id from mgstore.categories where slug='tecnologia'), 260000, 195000, 3, false, 'img/22.webp', 410),
+  ('drone-plegable-con-camara-hd-wi-fi-y-estuche-43', 'Drone Plegable con Cámara HD, Wi-Fi y Estuche', null, (select id from mgstore.categories where slug='drones'), 150000, 95000, 4, false, 'img/21.webp', 420),
+  ('drone-avion-con-camara-hd-luces-led-y-2-baterias-44', 'Drone Avión con Cámara HD, Luces LED y 2 Baterías', null, (select id from mgstore.categories where slug='drones'), 140000, 90000, 4, false, 'img/20.webp', 430),
+  ('dron-cuadricoptero-luk-con-camara-hd-y-2-baterias-45', 'Dron Cuadricóptero LUK con Cámara HD y 2 Baterías', (select id from mgstore.brands where slug='luk'), (select id from mgstore.categories where slug='drones'), 170000, 115000, 6, false, 'img/19.webp', 440),
+  ('mini-drone-quadricoptero-plegable-con-camara-46', 'Mini Drone Quadricóptero Plegable con Cámara', null, (select id from mgstore.categories where slug='drones'), 150000, 95000, 5, false, 'img/18.webp', 450),
+  ('drone-quadricoptero-con-camara-hd-y-control-con-pantalla-47', 'Drone Quadricóptero con Cámara HD y Control con Pantalla', null, (select id from mgstore.categories where slug='drones'), 220000, 145000, 5, false, 'img/17.webp', 460),
+  ('tabla-de-boxeo-musical-interactiva-con-luces-y-guantes-48', 'Tabla de Boxeo Musical Interactiva con Luces y Guantes', null, (select id from mgstore.categories where slug='juegos'), 150000, 105000, 5, false, 'img/16.webp', 470),
+  ('auto-acrobatico-a-control-remoto-con-luces-led-musica-y-giro-49', 'Auto Acrobático a Control Remoto con Luces LED, Música y Giro 360°', null, (select id from mgstore.categories where slug='vehiculos-rc'), 145000, 95000, 6, false, 'img/38.webp', 480),
+  ('titanic-armable-con-bloques-607-piezas-50', 'Titanic Armable con Bloques – 607 piezas', null, (select id from mgstore.categories where slug='bloques-armables'), 80000, 45000, 8, false, 'img/15.webp', 490),
+  ('auto-deportivo-armable-con-bloques-escala-1-14-51', 'Auto Deportivo Armable con Bloques – Escala 1:14', null, (select id from mgstore.categories where slug='bloques-armables'), 190000, 135000, 1, false, 'img/14.webp', 500),
+  ('estadio-santiago-bernabeu-101-piezas-puzzle-3d-52', 'Estadio Santiago Bernabéu – 101 piezas - Puzzle 3D', null, (select id from mgstore.categories where slug='bloques-armables'), 120000, 65000, 9, false, 'img/13.webp', 510),
+  ('speaker-ecopower-ep-s107-53', 'SPEAKER ECOPOWER EP-S107', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='audio'), 260000, 215000, 2, false, 'img/12.webp', 520),
+  ('speaker-ecopower-ep-1960-6-5-60-w-bluetooth-negro-54', 'Speaker Ecopower EP-1960 6.5" 60 W Bluetooth - Negro', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='audio'), 535000, 435000, 2, false, 'img/11.webp', 530),
+  ('walkie-talkie-luo-lu-820s-55', 'WALKIE TALKIE LUO LU-820S', (select id from mgstore.brands where slug='luo'), (select id from mgstore.categories where slug='tecnologia'), 195000, 140000, 3, false, 'img/10.webp', 540),
+  ('smartwatch-luo-w8-ultra-49mm-naranja-56', 'SMARTWATCH LUO W8 ULTRA - 49MM - NARANJA', (select id from mgstore.brands where slug='luo'), (select id from mgstore.categories where slug='tecnologia'), 120000, 80000, 2, false, 'img/09.webp', 550),
+  ('speaker-astronauta-con-led-lu-2111-57', 'SPEAKER ASTRONAUTA CON LED LU-2111', (select id from mgstore.brands where slug='luo'), (select id from mgstore.categories where slug='audio'), 145000, 105000, 2, false, 'img/08.webp', 560),
+  ('cargador-portatil-de-33-000-mah-ecopower-ep-c838-58', 'CARGADOR PORTATIL DE 33.000 mAh - ECOPOWER / EP-C838', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='tecnologia'), 190000, 140000, 4, false, 'img/05.webp', 570),
+  ('camara-infantil-luo-lu-x209-con-display-azul-59', 'CAMARA INFANTIL LUO LU-X209 / CON DISPLAY / AZUL', (select id from mgstore.brands where slug='luo'), (select id from mgstore.categories where slug='foto-video'), 130000, 80000, 2, false, 'img/04.webp', 580),
+  ('auricular-con-bluetooth-recargable-diseno-infantil-lu-993-60', 'Auricular Con Bluetooth Recargable Diseño Infantil / LU-993', (select id from mgstore.brands where slug='luo'), (select id from mgstore.categories where slug='audio'), 130000, 90000, 2, false, 'img/03.webp', 590),
+  ('auricular-inalambrico-ecopower-ep-h150-61', 'AURICULAR INALÁMBRICO ECOPOWER EP-H150', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='audio'), 120000, 76000, 3, false, 'img/02.webp', 600),
+  ('corta-pelo-ep-2811-ecopower-62', 'CORTA PELO EP-2811 ECOPOWER', (select id from mgstore.brands where slug='ecopower'), (select id from mgstore.categories where slug='cuidado-personal'), 260000, 195000, 2, false, 'img/01.webp', 610)
 on conflict (slug) do nothing;
 -- Promover a admin@mgstore.com al rol admin.
--- El helper public.is_admin() chequea auth.jwt() -> 'app_metadata' -> 'role'.
+-- El helper mgstore.is_admin() chequea auth.jwt() -> 'app_metadata' -> 'role'.
 -- Después de este update tenés que cerrar sesión y volver a entrar en admin.html
 -- para que el JWT nuevo traiga el rol.
 

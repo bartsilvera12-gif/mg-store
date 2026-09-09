@@ -1,7 +1,7 @@
 -- MG Store — seed de categorías y marcas (matchean el hardcode del frontend).
 -- Idempotente: on conflict do nothing.
 
-insert into public.categories (slug, name, sort_order) values
+insert into mgstore.categories (slug, name, sort_order) values
   ('drones',            'Drones',              10),
   ('vehiculos-rc',      'Vehículos RC',        20),
   ('bloques-armables',  'Bloques y armables',  30),
@@ -14,7 +14,7 @@ insert into public.categories (slug, name, sort_order) values
   ('cuidado-personal',  'Cuidado personal',   100)
 on conflict (slug) do nothing;
 
-insert into public.brands (slug, name, on_dark_bg, sort_order) values
+insert into mgstore.brands (slug, name, on_dark_bg, sort_order) values
   ('ecopower',   'Ecopower',   false, 10),
   ('satellite',  'Satellite',  true,  20), -- SATE con fondo oscuro
   ('luo',        'LUO',        false, 30),

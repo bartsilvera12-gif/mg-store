@@ -1,5 +1,5 @@
 -- Promover a admin@mgstore.com al rol admin.
--- El helper public.is_admin() chequea auth.jwt() -> 'app_metadata' -> 'role'.
+-- El helper mgstore.is_admin() chequea auth.jwt() -> 'app_metadata' -> 'role'.
 -- Después de este update tenés que cerrar sesión y volver a entrar en admin.html
 -- para que el JWT nuevo traiga el rol.
 

@@ -466,18 +466,39 @@ function renderLogin() {
 
 // -------------------- boot ------------------------
 
+function fatal(err, hint) {
+  console.error('[admin]', err);
+  app.innerHTML = `<div style="padding:40px;max-width:720px;margin:40px auto;background:#fff;border:2px solid var(--red);font-size:14px;line-height:1.5">
+    <h2 style="color:var(--red);margin:0 0 12px">No pude arrancar el admin</h2>
+    <p style="margin:0 0 12px"><strong>Error:</strong> ${(err && err.message) || err}</p>
+    ${hint ? `<p style="margin:0 0 12px;color:var(--muted)">${hint}</p>` : ''}
+    <p style="margin:12px 0 0;font-size:12px;color:var(--muted)">Abrí la consola del navegador (F12 → Console) para ver el detalle.</p>
+  </div>`;
+}
+
 (async () => {
-  if (cfg.supabaseUrl.includes('TU-') || cfg.supabaseAnonKey.startsWith('TU_')) {
-    app.innerHTML = `<div style="padding:40px;max-width:640px;margin:40px auto;background:#fff;border:2px solid var(--red)">
-      <h2 style="color:var(--red)">Configurá Supabase</h2>
-      <p>Editá <code>admin.html</code> arriba de todo y reemplazá <code>supabaseUrl</code> y
-      <code>supabaseAnonKey</code> con los valores de tu proyecto (Studio → Project Settings → API).</p>
-    </div>`;
-    return;
+  try {
+    if (!window.supabase || !window.supabase.createClient) {
+      fatal(new Error('El SDK de Supabase no cargó'), 'Chequeá que https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2 no esté bloqueado.');
+      return;
+    }
+    if (cfg.supabaseUrl.includes('TU-') || cfg.supabaseAnonKey.startsWith('TU_')) {
+      fatal(new Error('Falta configurar supabaseUrl / supabaseAnonKey'), 'Editá el bloque MG_ADMIN_CONFIG arriba de todo en admin.html.');
+      return;
+    }
+    // Ping mínimo al endpoint auth para chequear conectividad y CORS.
+    const ping = await fetch(cfg.supabaseUrl.replace(/\/$/, '') + '/auth/v1/settings', {
+      headers: { apikey: cfg.supabaseAnonKey }
+    }).catch(e => { throw new Error('No se pudo conectar a ' + cfg.supabaseUrl + ' — ' + e.message); });
+    if (!ping.ok && ping.status !== 404) {
+      throw new Error('Supabase respondió ' + ping.status + ' en /auth/v1/settings');
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) { state.user = session.user; await loadAll(); }
+    else render();
+  } catch (err) {
+    fatal(err, 'Puede ser CORS (agregá mgstorepy.com a los orígenes permitidos en Supabase), la URL mal, o el schema mgstore no expuesto todavía.');
   }
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session) { state.user = session.user; await loadAll(); }
-  else render();
 })();
 </script>
 </body>

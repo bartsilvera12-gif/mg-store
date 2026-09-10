@@ -12,6 +12,15 @@
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <script src="./support.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script>
+  // Backend Supabase (self-hosted). El catálogo público se lee desde acá.
+  window.MG_STORE_CONFIG = {
+    supabaseUrl: 'https://api.neura.com.py',
+    supabaseAnonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYW5vbiIsImlzcyI6InN1cGFiYXNlIiwiaWF0IjoxNzc0MTAxNDYxLCJleHAiOjE5MzE3ODE0NjF9.7_wAph8IolPMXtgfpezSwS5XR62IdD__qhqCywLDp3Q',
+    schema: 'mgstore'
+  };
+</script>
 </head>
 <body>
 <x-dc>
@@ -640,24 +649,52 @@
     <span data-m="watext">¿Necesitás ayuda?</span>
   </a>
 
-  <!-- search overlay -->
+  <!-- search: panel que baja del header, no full-screen -->
   <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
-  <div style="position:fixed;inset:0;z-index:100;background:linear-gradient(135deg,#071433 0%,#0B1F5F 55%,#1B49D6 100%);animation:mgUp .25s ease both;overflow:auto;color:#fff">
-    <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(60% 60% at 15% 20%,rgba(108,189,237,.35),transparent 60%),radial-gradient(55% 55% at 85% 10%,rgba(30,181,49,.28),transparent 55%),radial-gradient(50% 60% at 70% 85%,rgba(78,217,98,.22),transparent 60%)"></div>
-    <div style="position:relative;max-width:1100px;margin:0 auto;padding:clamp(24px,6vh,64px) clamp(20px,5vw,72px)">
-      <div style="display:flex;justify-content:flex-end"><button onClick="{{ closeSearch }}" aria-label="Cerrar" style="width:44px;height:44px;border:0;background:transparent;cursor:pointer;color:#fff"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button></div>
-      <div style="display:flex;align-items:center;gap:16px;border-bottom:3px solid rgba(255,255,255,.55);padding:12px 0">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
-        <input ref="{{ searchRef }}" type="search" placeholder="¿Qué estás buscando?" aria-label="Buscar" style="flex:1;min-width:0;border:0;outline:none;font-size:clamp(24px,3vw,40px);font-weight:700;color:#fff;background:transparent;padding:8px 0;caret-color:#4ED962" />
-      </div>
-      <div style="display:flex;gap:24px;margin-top:14px;font-size:13px;color:rgba(255,255,255,.7);font-weight:600"><span>Productos</span><span>Marcas</span><span>Categorías</span></div>
-      <div style="margin-top:48px">
-        <div style="font-size:12px;font-weight:800;letter-spacing:.12em;color:#4ED962;margin-bottom:16px">BÚSQUEDAS POPULARES</div>
-        <div style="display:flex;flex-wrap:wrap;gap:10px">
-          <sc-for list="{{ popular }}" as="term" hint-placeholder-count="4">
-            <button style="height:44px;padding:0 18px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#4ED962;background:rgba(255,255,255,.16)">{{ term }}</button>
-          </sc-for>
+  <div style="position:fixed;inset:0;z-index:110;animation:mgUp .18s ease both">
+    <div onClick="{{ closeSearch }}" style="position:absolute;inset:0;background:rgba(7,20,51,.45);backdrop-filter:blur(2px)"></div>
+    <div style="position:relative;background:#fff;border-bottom:2px solid #0B1F5F;box-shadow:0 24px 48px -24px rgba(11,31,95,.35);max-height:80vh;overflow:auto">
+      <div style="max-width:900px;margin:0 auto;padding:18px clamp(16px,4vw,32px) 24px">
+        <div style="display:flex;align-items:center;gap:12px;border-bottom:2px solid #0B1F5F;padding:6px 0 10px">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B1F5F" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+          <input ref="{{ searchRef }}" type="search" placeholder="Buscar productos, marcas, categorías..." aria-label="Buscar" value="{{ searchQuery }}" onInput="{{ onSearchInput }}" style="flex:1;min-width:0;border:0;outline:none;font-size:18px;font-weight:600;color:#0B1F5F;background:transparent;padding:6px 0" />
+          <button onClick="{{ closeSearch }}" aria-label="Cerrar" style="width:36px;height:36px;border:0;background:transparent;cursor:pointer;color:#5B6480" style-hover="color:#0B1F5F"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
         </div>
+
+        <sc-if value="{{ searchHasResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding-top:14px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#5B6480;margin-bottom:10px">{{ searchResultsLabel }}</div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ searchResults }}" as="r" hint-placeholder-count="3">
+              <a href="#catalogo" onClick="{{ r.go }}" style="display:grid;grid-template-columns:52px 1fr auto;gap:14px;align-items:center;padding:10px 8px;text-decoration:none;color:#0F1633;border-bottom:1px solid #E3E7F0;transition:background .15s" style-hover="background:#F3F5FA">
+                <div style="width:52px;height:52px;background:#F3F5FA;display:flex;align-items:center;justify-content:center;overflow:hidden"><img src="{{ r.img }}" alt="" loading="lazy" style="max-width:82%;max-height:82%;object-fit:contain;mix-blend-mode:multiply" /></div>
+                <div style="min-width:0">
+                  <div style="font-size:14px;font-weight:700;line-height:1.25;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical">{{ r.name }}</div>
+                  <div style="font-size:11px;color:#5B6480;font-weight:600;margin-top:2px">{{ r.metaLabel }}</div>
+                </div>
+                <div style="font-size:14px;font-weight:800;color:#0B1F5F;white-space:nowrap">{{ r.priceLabel }}</div>
+              </a>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ searchNoResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:24px 8px;color:#5B6480;font-size:14px">
+          Nada encontrado para <strong style="color:#0B1F5F">"{{ searchQuery }}"</strong>. Probá otra palabra o mirá las categorías.
+        </div>
+        </sc-if>
+
+        <sc-if value="{{ searchIdle }}" hint-placeholder-val="{{ true }}">
+        <div style="padding-top:16px">
+          <div style="font-size:11px;font-weight:800;letter-spacing:.1em;color:#1EB531;margin-bottom:10px">BÚSQUEDAS POPULARES</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <sc-for list="{{ popular }}" as="term" hint-placeholder-count="4">
+              <button onClick="{{ term.pick }}" style="height:36px;padding:0 14px;border:1px solid #E3E7F0;background:#fff;font-size:13px;font-weight:700;color:#0B1F5F;cursor:pointer;transition:border-color .2s,background .2s" style-hover="border-color:#1B49D6;background:#EEF2FD">{{ term.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
       </div>
     </div>
   </div>
@@ -755,7 +792,7 @@
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;whatsappNumber&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contacto&quot;},&quot;showTopBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;heroHeadline&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;encontrar&quot;,&quot;options&quot;:[&quot;encontrar&quot;,&quot;necesitas&quot;,&quot;casa&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;}}">
 class Component extends DCLogic {
-  state = { scrolled: false, megaOpen: false, searchOpen: false, menuOpen: false, view: 'home', cats: [], brands: [], minPrice: 0, maxPrice: 600000, sort: 'relevancia', sortOpen: false, onlyStock: false, onlyOffer: false, cart: {}, cartOpen: false, cartFlash: 0 };
+  state = { scrolled: false, megaOpen: false, searchOpen: false, menuOpen: false, view: 'home', cats: [], brands: [], minPrice: 0, maxPrice: 600000, sort: 'relevancia', sortOpen: false, onlyStock: false, onlyOffer: false, cart: {}, cartOpen: false, cartFlash: 0, searchQuery: '' };
   raw = [
     ['Mini Masajeador Portatil Ecopower', 'Ecopower', 'Cuidado personal', 40, 90, 18, 1],
     ['Linterna + Kit de herramientas Ecopower', 'Ecopower', 'Herramientas', 50, 100, 18, 1],
@@ -824,6 +861,39 @@ class Component extends DCLogic {
   catalog = this.raw.map(([name, brand, category, gan, may, stock, feat], i) => ({ name, brand, category, price: (may + gan) * 1000, wholesale: may * 1000, stock, featured: !!feat, img: 'img/' + String(this.imgs[i]).padStart(2, '0') + '.webp' }));
   gs(n) { return 'Gs. ' + n.toLocaleString('es-PY'); }
   toggleIn(key, v) { this.setState(s => ({ [key]: s[key].includes(v) ? s[key].filter(x => x !== v) : s[key].concat(v) })); }
+  async fetchCatalogFromSupabase() {
+    // Trata de reemplazar el catálogo hardcoded por el de Supabase.
+    // Si algo falla (sin red, sin config, sin filas), se queda con el fallback.
+    const cfg = window.MG_STORE_CONFIG;
+    if (!cfg || !window.supabase || !window.supabase.createClient) return;
+    try {
+      const sb = window.supabase.createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
+        auth: { persistSession: false },
+        db: { schema: cfg.schema || 'public' }
+      });
+      const { data, error } = await sb
+        .from('products')
+        .select('name, price_gs, wholesale_price_gs, stock, featured, image_url, brand:brands(name), category:categories(name)')
+        .eq('active', true)
+        .order('sort_order', { ascending: true });
+      if (error) { console.warn('[mg] Supabase error, uso fallback:', error.message); return; }
+      if (!data || data.length === 0) { console.info('[mg] Supabase devolvió 0 productos, uso fallback.'); return; }
+      this.catalog = data.map(p => ({
+        name: p.name,
+        brand: (p.brand && p.brand.name) || '',
+        category: (p.category && p.category.name) || '',
+        price: Number(p.price_gs) || 0,
+        wholesale: Number(p.wholesale_price_gs) || 0,
+        stock: Number(p.stock) || 0,
+        featured: !!p.featured,
+        img: p.image_url || 'logo.png'
+      }));
+      this.forceUpdate();
+      console.info('[mg] Catálogo cargado desde Supabase:', this.catalog.length, 'productos');
+    } catch (e) {
+      console.warn('[mg] no pude conectar con Supabase, uso fallback:', e && e.message);
+    }
+  }
   saveCart(cart) {
     try { localStorage.setItem('mg_cart', JSON.stringify(cart)); } catch (e) {}
   }
@@ -872,6 +942,7 @@ class Component extends DCLogic {
       const saved = JSON.parse(localStorage.getItem('mg_cart') || '{}');
       if (saved && typeof saved === 'object') this.setState({ cart: saved });
     } catch (e) {}
+    this.fetchCatalogFromSupabase();
     this.io = new IntersectionObserver(([e]) => this.setState({ footerVisible: e.isIntersecting }), { threshold: 0 });
     this.observeFooter();
     this.observeAbout();
@@ -1041,8 +1112,39 @@ class Component extends DCLogic {
       megaOpen, searchOpen: this.state.searchOpen, menuOpen: this.state.menuOpen,
       openMega: () => this.setState({ megaOpen: true }),
       closeMega: () => this.setState({ megaOpen: false }),
-      openSearch: () => this.setState({ searchOpen: true, megaOpen: false }),
+      openSearch: () => this.setState({ searchOpen: true, megaOpen: false, searchQuery: '' }),
       closeSearch: () => this.setState({ searchOpen: false }),
+      searchQuery: this.state.searchQuery,
+      onSearchInput: (e) => this.setState({ searchQuery: e.target.value }),
+      ...(() => {
+        const q = (this.state.searchQuery || '').trim().toLowerCase();
+        if (!q) return { searchIdle: true, searchHasResults: false, searchNoResults: false, searchResults: [], searchResultsLabel: '' };
+        const hits = this.catalog.filter(p =>
+          p.name.toLowerCase().includes(q) ||
+          (p.brand || '').toLowerCase().includes(q) ||
+          (p.category || '').toLowerCase().includes(q)
+        );
+        const shown = hits.slice(0, 8);
+        return {
+          searchIdle: false,
+          searchHasResults: hits.length > 0,
+          searchNoResults: hits.length === 0,
+          searchResultsLabel: hits.length === 1
+            ? '1 producto'
+            : (hits.length > 8 ? '8 de ' + hits.length + ' productos' : hits.length + ' productos'),
+          searchResults: shown.map(p => ({
+            name: p.name, img: p.img,
+            metaLabel: [p.brand, p.category].filter(Boolean).join(' · ') || p.category,
+            priceLabel: this.gs(p.price),
+            go: (e) => {
+              if (e && e.preventDefault) e.preventDefault();
+              const hasCat = allCats.includes(p.category);
+              this.setState({ view: 'catalog', cats: hasCat ? [p.category] : [], brands: [], searchOpen: false, searchQuery: '' });
+              window.scrollTo({ top: 0 });
+            }
+          }))
+        };
+      })(),
       openMenu: () => this.setState({ menuOpen: true }),
       closeMenu: () => this.setState({ menuOpen: false }),
       // Cart wiring
@@ -1106,7 +1208,10 @@ class Component extends DCLogic {
           { name: 'Herramientas y hogar', items: wrap(['Herramientas', 'Hogar y mascotas', 'Cuidado personal']) }
         ];
       })(),
-      popular: ['Drones', 'Bloques para armar', 'Control remoto', 'Speakers'],
+      popular: ['Drones', 'Bloques', 'Control remoto', 'Speakers', 'Ecopower', 'Satellite'].map(term => ({
+        label: term,
+        pick: () => this.setState({ searchQuery: term })
+      })),
       aboutRef: this.aboutRef,
       aboutCards: [
         ['01', 'Catálogo curado', 'Cada producto entra a la tienda porque lo probamos y sabemos qué esperar de él.'],

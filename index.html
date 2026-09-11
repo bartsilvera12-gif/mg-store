@@ -423,6 +423,28 @@
   <section style="position:relative;overflow:hidden;background:#071433">
     <x-import component="ShaderBackground" from="./ShaderBackground.jsx" style="position:absolute;inset:0" hint-size="100%,100%"></x-import>
     <div style="position:relative;z-index:1;max-width:1440px;margin:0 auto;padding:48px clamp(20px,5vw,72px) 72px;display:grid;grid-template-columns:repeat(12,1fr);gap:24px;align-items:center" data-m="stack tight">
+      <!-- Mobile-only: marquee horizontal compacto arriba del copy -->
+      <div data-m="show heromviz" style="display:none;grid-column:span 12;position:relative;height:170px;overflow:hidden;mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);-webkit-mask-image:linear-gradient(to right,transparent,#000 6%,#000 94%,transparent);animation:mgUp .6s ease both">
+        <div style="display:flex;gap:12px;height:100%;width:max-content;animation:mgMarquee 28s linear infinite;will-change:transform">
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/18.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/11.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/52.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/57.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/09.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/37.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/61.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/23.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <!-- duplicado para loop sin salto -->
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/18.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/11.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/52.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/57.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/09.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/37.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/61.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+          <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:14px;flex:0 0 auto;height:100%"><img src="img/23.webp" alt="" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
+        </div>
+      </div>
       <div style="grid-column:span 5;display:flex;flex-direction:column;gap:24px;animation:mgUp .5s ease both">
         <div style="font-size:12px;font-weight:800;letter-spacing:.14em;color:#4ED962">TODO EN UN SOLO LUGAR</div>
         <h1 data-m="h1" style="margin:0;font-size:clamp(40px,4.4vw,62px);line-height:1.02;font-weight:800;letter-spacing:-.025em;color:#fff;text-wrap:pretty;display:flex;flex-direction:column;gap:6px;align-items:flex-start">
@@ -437,7 +459,7 @@
         <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.72);letter-spacing:.02em;padding-top:8px;border-top:1px solid rgba(255,255,255,.25);margin-top:8px;max-width:360px">Envíos · Compra segura · Atención directa</div>
       </div>
 
-      <div data-m="viz" style="grid-column:7 / span 6;position:relative;height:560px;animation:mgUp .6s .1s ease both">
+      <div data-m="viz hide" style="grid-column:7 / span 6;position:relative;height:560px;animation:mgUp .6s .1s ease both">
         <div style="position:absolute;inset:0;display:grid;grid-template-columns:1fr 1fr;gap:12px;overflow:hidden;mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent);-webkit-mask-image:linear-gradient(to bottom,transparent,#000 12%,#000 88%,transparent)">
           <x-import component="MarqueeEffect" from="./MarqueeEffect.jsx" direction="vertical" gap="12" speed="30" speed-on-hover="4" hint-size="100%,560px">
             <figure style="margin:0;aspect-ratio:1/1;background:#F3F5FA;display:flex;align-items:center;justify-content:center;padding:18px"><img src="img/18.webp" alt="Mini drone plegable con cámara" style="max-width:100%;max-height:100%;object-fit:contain;mix-blend-mode:multiply" /></figure>
